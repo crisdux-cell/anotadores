@@ -709,10 +709,10 @@
                         <div class="mt-4 pt-3 border-t border-slate-100 text-center">
                             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Comprobante de Pago</span>
                             ${game.receiptTeam1 ? `
-                                <a href="${game.receiptTeam1}" target="_blank" class="inline-block group">
+                                <button onclick="openImageViewer('${game.receiptTeam1}', 'comprobante_${game.team1Name}.jpg')" class="inline-block group cursor-pointer border-0 bg-transparent p-0">
                                     <img src="${game.receiptTeam1}" class="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-xl border-2 border-slate-200 shadow hover:opacity-90 transition mx-auto" alt="Comprobante ${game.team1Name}">
-                                    <span class="text-[10px] font-extrabold text-navy-900 group-hover:text-gold-600 block mt-1"><i class="fas fa-search-plus mr-1"></i>Ver en grande</span>
-                                </a>
+                                    <span class="text-[10px] font-extrabold text-slate-700 group-hover:text-amber-600 block mt-1"><i class="fas fa-search-plus mr-1"></i>Ver en grande</span>
+                                </button>
                             ` : `
                                 <div class="bg-slate-50 border border-dashed border-slate-200 rounded-xl p-3 text-slate-400 text-xs">
                                     <i class="fas fa-receipt text-slate-300 text-lg mb-1 block"></i>
@@ -737,10 +737,10 @@
                         <div class="mt-4 pt-3 border-t border-slate-100 text-center">
                             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Comprobante de Pago</span>
                             ${game.receiptTeam2 ? `
-                                <a href="${game.receiptTeam2}" target="_blank" class="inline-block group">
+                                <button onclick="openImageViewer('${game.receiptTeam2}', 'comprobante_${game.team2Name}.jpg')" class="inline-block group cursor-pointer border-0 bg-transparent p-0">
                                     <img src="${game.receiptTeam2}" class="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-xl border-2 border-slate-200 shadow hover:opacity-90 transition mx-auto" alt="Comprobante ${game.team2Name}">
-                                    <span class="text-[10px] font-extrabold text-navy-900 group-hover:text-gold-600 block mt-1"><i class="fas fa-search-plus mr-1"></i>Ver en grande</span>
-                                </a>
+                                    <span class="text-[10px] font-extrabold text-slate-700 group-hover:text-amber-600 block mt-1"><i class="fas fa-search-plus mr-1"></i>Ver en grande</span>
+                                </button>
                             ` : `
                                 <div class="bg-slate-50 border border-dashed border-slate-200 rounded-xl p-3 text-slate-400 text-xs">
                                     <i class="fas fa-receipt text-slate-300 text-lg mb-1 block"></i>
@@ -755,15 +755,15 @@
                 <div class="bg-white border border-amber-300 rounded-2xl p-4 sm:p-5 flex items-center gap-4 shadow-sm">
                     <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-500 text-3xl flex-shrink-0 border border-amber-200 shadow-inner overflow-hidden">
                         ${game.mvpPhoto ? `
-                            <a href="${game.mvpPhoto}" target="_blank" class="w-full h-full block group" title="Clic para ver en grande">
+                            <button onclick="openImageViewer('${game.mvpPhoto}', 'mvp_${game.mvpName || 'foto'}.jpg')" class="w-full h-full block group cursor-pointer border-0 bg-transparent p-0" title="Clic para ver en grande">
                                 <img src="${game.mvpPhoto}" class="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition" alt="MVP">
-                            </a>
+                            </button>
                         ` : '<i class="fas fa-trophy"></i>'}
                     </div>
                     <div class="flex-1">
                         <span class="bg-amber-400 text-navy-950 font-black text-[10px] px-2.5 py-0.5 rounded-md uppercase tracking-wider inline-block">JUGADOR MVP</span>
                         <h4 class="text-lg font-black text-slate-900 mt-1">${game.mvpName || 'No designado'}</h4>
-                        ${game.mvpPhoto ? '<a href="' + game.mvpPhoto + '" target="_blank" class="text-[11px] text-amber-800 font-bold hover:underline inline-flex items-center gap-1 mt-1"><i class="fas fa-image"></i> Ver foto completa</a>' : ''}
+                        ${game.mvpPhoto ? '<button onclick="openImageViewer(\'' + game.mvpPhoto + '\', \'mvp_' + (game.mvpName || 'foto') + '.jpg\')" class="text-[11px] text-amber-800 font-bold hover:underline inline-flex items-center gap-1 mt-1 border-0 bg-transparent cursor-pointer p-0"><i class="fas fa-image"></i> Ver foto completa</button>' : ''}
                     </div>
                 </div>
 
@@ -1165,5 +1165,48 @@
             showToast('Datos Cargados', 'Se cargaron 3 juegos de demostración listos para probar.');
         }
     </script>
+    <!-- ===== IMAGE VIEWER SCRIPT ===== -->
+    <script>
+        function openImageViewer(src, filename) {
+            const modal = document.getElementById('img-viewer-modal');
+            const img   = document.getElementById('img-viewer-img');
+            const dl    = document.getElementById('img-viewer-download');
+            img.src     = src;
+            dl.href     = src;
+            dl.download = filename || 'imagen.jpg';
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeImageViewer() {
+            const modal = document.getElementById('img-viewer-modal');
+            modal.classList.add('hidden');
+            document.getElementById('img-viewer-img').src = '';
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeImageViewer();
+        });
+    </script>
+    <!-- ===== LIGHTBOX / IMAGE VIEWER MODAL ===== -->
+    <div id="img-viewer-modal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <!-- Overlay -->
+        <div class="absolute inset-0 bg-black/85 backdrop-blur-sm" onclick="closeImageViewer()"></div>
+        <!-- Content -->
+        <div class="relative z-10 flex flex-col items-center gap-4 max-w-screen-md w-full">
+            <!-- Close button -->
+            <button onclick="closeImageViewer()" class="absolute -top-2 -right-2 sm:top-0 sm:right-0 w-10 h-10 bg-white/20 hover:bg-white/40 text-white rounded-full flex items-center justify-center text-xl font-black transition" aria-label="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+            <!-- Image -->
+            <img id="img-viewer-img" src="" alt="Vista completa"
+                 class="max-h-[80vh] max-w-full rounded-2xl shadow-2xl border-2 border-white/20 object-contain bg-black/30">
+            <!-- Download button -->
+            <a id="img-viewer-download" href="" download="imagen.jpg"
+               class="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-slate-900 font-black text-sm px-6 py-2.5 rounded-full shadow-lg transition">
+                <i class="fas fa-download"></i> Descargar imagen
+            </a>
+        </div>
+    </div>
+
 </body>
 </html>
