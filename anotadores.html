@@ -322,225 +322,26 @@
 
                             <!-- Equipo Select or Custom Text -->
                             <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1" id="team1-label">Equipo Ganador *</label>
-                                <select id="team1-select" onchange="handleTeamSelect('team1')" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 bg-white text-sm font-bold text-slate-800 mb-2">
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="block text-xs font-bold text-slate-600 uppercase" id="team1-label">Equipo Ganador *</label>
+                                    <span id="team1-count-badge" class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full"></span>
+                                </div>
+
+                                <!-- Buscador Rápido de Equipo 1 -->
+                                <div class="relative mb-2">
+                                    <input type="text" id="team1-search" oninput="filterTeamSearch('team1', this.value)" 
+                                           placeholder="🔍 Escribe para buscar rápido..." 
+                                           autocomplete="off"
+                                           class="w-full pl-8 pr-7 py-2 text-xs font-semibold rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition shadow-sm placeholder:text-slate-400">
+                                    <i class="fas fa-search absolute left-2.5 top-2.5 text-slate-400 text-xs"></i>
+                                    <button type="button" onclick="clearTeamSearch('team1')" id="team1-search-clear" 
+                                            class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-red-500 text-xs transition" title="Borrar búsqueda">
+                                        <i class="fas fa-times-circle"></i>
+                                    </button>
+                                </div>
+
+                                <select id="team1-select" onchange="handleTeamSelect('team1')" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 bg-white text-sm font-bold text-slate-800 mb-2 transition">
                                     <option value="">-- Seleccione Equipo --</option>
-                                    <optgroup label="PREINFANTIL">
-                                        <option value="Atlético A">Atlético A</option>
-                                        <option value="Atlético B">Atlético B</option>
-                                        <option value="Atlético C">Atlético C</option>
-                                        <option value="Azulejos del Hatillo B">Azulejos del Hatillo B</option>
-                                        <option value="Blue Jays A">Blue Jays A</option>
-                                        <option value="Bravos 16 gris">Bravos 16 gris</option>
-                                        <option value="Bravos 16 Vinotinto">Bravos 16 Vinotinto</option>
-                                        <option value="Bravos de Caricuao B">Bravos de Caricuao B</option>
-                                        <option value="Bravos de Miranda A">Bravos de Miranda A</option>
-                                        <option value="Cachorros de coche B">Cachorros de coche B</option>
-                                        <option value="Cardenales B">Cardenales B</option>
-                                        <option value="Cardenalitos B">Cardenalitos B</option>
-                                        <option value="Caribeans kids A">Caribeans kids A</option>
-                                        <option value="Caribes Tribu B">Caribes Tribu B</option>
-                                        <option value="Dmapro B">Dmapro B</option>
-                                        <option value="Dodgers A">Dodgers A</option>
-                                        <option value="Dodgers B">Dodgers B</option>
-                                        <option value="Doraya B">Doraya B</option>
-                                        <option value="Huracanes A">Huracanes A</option>
-                                        <option value="Incas B">Incas B</option>
-                                        <option value="La urbina B">La urbina B</option>
-                                        <option value="Las minas A">Las minas A</option>
-                                        <option value="Las piedritas A">Las piedritas A</option>
-                                        <option value="Las piedritas B">Las piedritas B</option>
-                                        <option value="Las Piedritas C">Las Piedritas C</option>
-                                        <option value="Lion Kids A">Lion Kids A</option>
-                                        <option value="Lion kids B">Lion kids B</option>
-                                        <option value="Parque Miranda A">Parque Miranda A</option>
-                                        <option value="Parque Miranda A1">Parque Miranda A1</option>
-                                        <option value="Picapiedras B">Picapiedras B</option>
-                                        <option value="Picapiedras C">Picapiedras C</option>
-                                        <option value="Progreso A">Progreso A</option>
-                                        <option value="Ravelo A">Ravelo A</option>
-                                        <option value="San Luis A">San Luis A</option>
-                                        <option value="Santa Fe A">Santa Fe A</option>
-                                        <option value="Santa Fe A1">Santa Fe A1</option>
-                                        <option value="Santa fe B">Santa fe B</option>
-                                        <option value="Selección de Miranda Preparatorio">Selección de Miranda Preparatorio</option>
-                                        <option value="Selección DC preparatorio">Selección DC preparatorio</option>
-                                        <option value="Spartans B">Spartans B</option>
-                                        <option value="Team Sucre A">Team Sucre A</option>
-                                        <option value="Team Sucre B">Team Sucre B</option>
-                                        <option value="Team Sucre C">Team Sucre C</option>
-                                        <option value="Titanes de caricuao A">Titanes de caricuao A</option>
-                                        <option value="Titanes de catia B">Titanes de catia B</option>
-                                    </optgroup>
-                                    <optgroup label="INFANTIL">
-                                        <option value="Ángeles de Baruta A">Ángeles de Baruta A</option>
-                                        <option value="Artilleros B">Artilleros B</option>
-                                        <option value="Atlético A">Atlético A</option>
-                                        <option value="Atlético B">Atlético B</option>
-                                        <option value="Atlético C">Atlético C</option>
-                                        <option value="Azulejos del Hatillo B">Azulejos del Hatillo B</option>
-                                        <option value="Black Dog B">Black Dog B</option>
-                                        <option value="Brancos B">Brancos B</option>
-                                        <option value="Bravos 16 B gris">Bravos 16 B gris</option>
-                                        <option value="Bravos 16 Vinotinto">Bravos 16 Vinotinto</option>
-                                        <option value="Bravos de Caricuao A">Bravos de Caricuao A</option>
-                                        <option value="Bravos de Caricuao B">Bravos de Caricuao B</option>
-                                        <option value="Bravos de Miranda B">Bravos de Miranda B</option>
-                                        <option value="Cachorros de coche A">Cachorros de coche A</option>
-                                        <option value="Caciques de Sucre A">Caciques de Sucre A</option>
-                                        <option value="Cardenales B">Cardenales B</option>
-                                        <option value="Cardenalitos A">Cardenalitos A</option>
-                                        <option value="Caribes tribu A">Caribes tribu A</option>
-                                        <option value="Casiques de Sucre B">Casiques de Sucre B</option>
-                                        <option value="Cobras A">Cobras A</option>
-                                        <option value="Dmpro A">Dmpro A</option>
-                                        <option value="Dodgers A">Dodgers A</option>
-                                        <option value="Dodgers B">Dodgers B</option>
-                                        <option value="Dodgers C">Dodgers C</option>
-                                        <option value="Doraya B">Doraya B</option>
-                                        <option value="Gaudy A">Gaudy A</option>
-                                        <option value="Gigantes A">Gigantes A</option>
-                                        <option value="Incas A">Incas A</option>
-                                        <option value="KV Vargas A">KV Vargas A</option>
-                                        <option value="La urbina A">La urbina A</option>
-                                        <option value="La Urbina B">La Urbina B</option>
-                                        <option value="La Urbina C">La Urbina C</option>
-                                        <option value="Las piedritas A">Las piedritas A</option>
-                                        <option value="Las Piedritas B">Las Piedritas B</option>
-                                        <option value="Las piedritas C">Las piedritas C</option>
-                                        <option value="Lion kids A">Lion kids A</option>
-                                        <option value="Lion Kids B">Lion Kids B</option>
-                                        <option value="Loyola A">Loyola A</option>
-                                        <option value="Mempet B">Mempet B</option>
-                                        <option value="National JC">National JC</option>
-                                        <option value="Parque Miranda A">Parque Miranda A</option>
-                                        <option value="Parque Miranda A 1">Parque Miranda A 1</option>
-                                        <option value="Parque Miranda B">Parque Miranda B</option>
-                                        <option value="Parques Miranda B1">Parques Miranda B1</option>
-                                        <option value="Picapiedras B">Picapiedras B</option>
-                                        <option value="Progreso B">Progreso B</option>
-                                        <option value="Ravelo B">Ravelo B</option>
-                                        <option value="San Francisco LG A">San Francisco LG A</option>
-                                        <option value="Santa Fe A">Santa Fe A</option>
-                                        <option value="Santa Fe B">Santa Fe B</option>
-                                        <option value="Santa Fe B1">Santa Fe B1</option>
-                                        <option value="Spartans B">Spartans B</option>
-                                        <option value="Team sucre A">Team sucre A</option>
-                                        <option value="The Big Hand A">The Big Hand A</option>
-                                    </optgroup>
-                                    <optgroup label="PRE-JUNIOR">
-                                        <option value="Aguilas B">Aguilas B</option>
-                                        <option value="Artilleros B">Artilleros B</option>
-                                        <option value="Atta Boys A">Atta Boys A</option>
-                                        <option value="Atlético A">Atlético A</option>
-                                        <option value="Black Dog B">Black Dog B</option>
-                                        <option value="Bravos 16 A vinotinto">Bravos 16 A vinotinto</option>
-                                        <option value="Bravos 16 B Gris">Bravos 16 B Gris</option>
-                                        <option value="Bravos 16 Marron">Bravos 16 Marron</option>
-                                        <option value="Bravos de Caricuao B">Bravos de Caricuao B</option>
-                                        <option value="Bravos de Miranda A">Bravos de Miranda A</option>
-                                        <option value="Bravos de Miranda B">Bravos de Miranda B</option>
-                                        <option value="Caribes tribu B">Caribes tribu B</option>
-                                        <option value="Caribes tribu B1">Caribes tribu B1</option>
-                                        <option value="Cobras B">Cobras B</option>
-                                        <option value="Dmpro A">Dmpro A</option>
-                                        <option value="Dodgers B">Dodgers B</option>
-                                        <option value="Doraya B">Doraya B</option>
-                                        <option value="Gigantes B">Gigantes B</option>
-                                        <option value="Incas A">Incas A</option>
-                                        <option value="La Urbina A">La Urbina A</option>
-                                        <option value="La Urbina B">La Urbina B</option>
-                                        <option value="Las Piedritas A">Las Piedritas A</option>
-                                        <option value="Las piedritas B">Las piedritas B</option>
-                                        <option value="Lion Kids A">Lion Kids A</option>
-                                        <option value="Lion kids B">Lion kids B</option>
-                                        <option value="Los pandas B">Los pandas B</option>
-                                        <option value="Marlins B">Marlins B</option>
-                                        <option value="On Fire A">On Fire A</option>
-                                        <option value="Panteras B">Panteras B</option>
-                                        <option value="Parque Miranda A">Parque Miranda A</option>
-                                        <option value="Parque Miranda A1">Parque Miranda A1</option>
-                                        <option value="Parque Miranda B">Parque Miranda B</option>
-                                        <option value="Progreso B">Progreso B</option>
-                                        <option value="San Luis A">San Luis A</option>
-                                        <option value="San Luis B">San Luis B</option>
-                                        <option value="Santa Fe A">Santa Fe A</option>
-                                        <option value="Spartans B">Spartans B</option>
-                                        <option value="Team Locura A">Team Locura A</option>
-                                        <option value="Team Sucre A">Team Sucre A</option>
-                                        <option value="Team Sucre B">Team Sucre B</option>
-                                        <option value="The Big Hand A">The Big Hand A</option>
-                                        <option value="Tigres A">Tigres A</option>
-                                        <option value="Titanes de Catia B">Titanes de Catia B</option>
-                                    </optgroup>
-                                    <optgroup label="JUNIOR">
-                                        <option value="Atlético A">Atlético A</option>
-                                        <option value="Atta Boys A">Atta Boys A</option>
-                                        <option value="Black Dog B">Black Dog B</option>
-                                        <option value="Bravos de Miranda B">Bravos de Miranda B</option>
-                                        <option value="Broncos B">Broncos B</option>
-                                        <option value="Caribes Tribu B">Caribes Tribu B</option>
-                                        <option value="Dmpro A">Dmpro A</option>
-                                        <option value="Dmpro B">Dmpro B</option>
-                                        <option value="Dodgers A">Dodgers A</option>
-                                        <option value="Gaudy A">Gaudy A</option>
-                                        <option value="Gran Mariscal B">Gran Mariscal B</option>
-                                        <option value="Ravelo B">Ravelo B</option>
-                                        <option value="Spartans B">Spartans B</option>
-                                        <option value="Team Jr B">Team Jr B</option>
-                                        <option value="The Big Hand B">The Big Hand B</option>
-                                    </optgroup>
-                                    <optgroup label="JUVENIL">
-                                        <option value="Atlético">Atlético</option>
-                                        <option value="Broncos">Broncos</option>
-                                        <option value="Dodgers">Dodgers</option>
-                                        <option value="Spartans">Spartans</option>
-                                        <option value="The Gots">The Gots</option>
-                                    </optgroup>
-                                    <optgroup label="SEMILLERO">
-                                        <option value="Atlético B">Atlético B</option>
-                                        <option value="Blue Jays A">Blue Jays A</option>
-                                        <option value="Bravo 16 B">Bravo 16 B</option>
-                                        <option value="Cardenales A">Cardenales A</option>
-                                        <option value="Dodgers B">Dodgers B</option>
-                                        <option value="Doraya B">Doraya B</option>
-                                        <option value="Las Piedritas A">Las Piedritas A</option>
-                                        <option value="Las piedritas B">Las piedritas B</option>
-                                        <option value="San luis A">San luis A</option>
-                                        <option value="Santa fe A">Santa fe A</option>
-                                        <option value="Team Jr A">Team Jr A</option>
-                                        <option value="Team Jr B">Team Jr B</option>
-                                    </optgroup>
-                                    <optgroup label="PREPARATORIO">
-                                        <option value="Artilleros B">Artilleros B</option>
-                                        <option value="Atletico A">Atletico A</option>
-                                        <option value="Atletico B">Atletico B</option>
-                                        <option value="Bravos 16 A vinotinto">Bravos 16 A vinotinto</option>
-                                        <option value="Bravos 16 Gris">Bravos 16 Gris</option>
-                                        <option value="Bravos de Miranda A">Bravos de Miranda A</option>
-                                        <option value="Cardenales B">Cardenales B</option>
-                                        <option value="Cardenalitos A">Cardenalitos A</option>
-                                        <option value="Cardenalitos B">Cardenalitos B</option>
-                                        <option value="Caribeans kids A">Caribeans kids A</option>
-                                        <option value="Dodgers B">Dodgers B</option>
-                                        <option value="Doraya B">Doraya B</option>
-                                        <option value="Las Minas A">Las Minas A</option>
-                                        <option value="Las Piedritas A">Las Piedritas A</option>
-                                        <option value="Las Piedritas B">Las Piedritas B</option>
-                                        <option value="Las Piedritas C">Las Piedritas C</option>
-                                        <option value="Lion kids A">Lion kids A</option>
-                                        <option value="Parque Miranda A">Parque Miranda A</option>
-                                        <option value="Parque Miranda B">Parque Miranda B</option>
-                                        <option value="Picapiedras B">Picapiedras B</option>
-                                        <option value="Raptors B">Raptors B</option>
-                                        <option value="San luis A">San luis A</option>
-                                        <option value="San luis B">San luis B</option>
-                                        <option value="Team Jr A">Team Jr A</option>
-                                        <option value="Team Sucre A">Team Sucre A</option>
-                                        <option value="Team Sucre B">Team Sucre B</option>
-                                        <option value="The big Hand B">The big Hand B</option>
-                                        <option value="The Sea Dog B">The Sea Dog B</option>
-                                    </optgroup>
                                     <option value="CUSTOM">✍️ Escribir otro nombre...</option>
                                 </select>
                                 <input type="text" id="team1-custom" oninput="updateLiveSummary()" placeholder="Escriba el nombre del equipo..."
@@ -597,225 +398,26 @@
 
                             <!-- Equipo Select or Custom Text -->
                             <div>
-                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1" id="team2-label">Equipo Perdedor *</label>
-                                <select id="team2-select" onchange="handleTeamSelect('team2')" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-slate-500 bg-white text-sm font-bold text-slate-800 mb-2">
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="block text-xs font-bold text-slate-600 uppercase" id="team2-label">Equipo Perdedor *</label>
+                                    <span id="team2-count-badge" class="text-[10px] font-bold text-slate-700 bg-slate-200 px-2 py-0.5 rounded-full"></span>
+                                </div>
+
+                                <!-- Buscador Rápido de Equipo 2 -->
+                                <div class="relative mb-2">
+                                    <input type="text" id="team2-search" oninput="filterTeamSearch('team2', this.value)" 
+                                           placeholder="🔍 Escribe para buscar rápido..." 
+                                           autocomplete="off"
+                                           class="w-full pl-8 pr-7 py-2 text-xs font-semibold rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-slate-500 focus:border-slate-500 outline-none transition shadow-sm placeholder:text-slate-400">
+                                    <i class="fas fa-search absolute left-2.5 top-2.5 text-slate-400 text-xs"></i>
+                                    <button type="button" onclick="clearTeamSearch('team2')" id="team2-search-clear" 
+                                            class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-red-500 text-xs transition" title="Borrar búsqueda">
+                                        <i class="fas fa-times-circle"></i>
+                                    </button>
+                                </div>
+
+                                <select id="team2-select" onchange="handleTeamSelect('team2')" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-slate-500 bg-white text-sm font-bold text-slate-800 mb-2 transition">
                                     <option value="">-- Seleccione Equipo --</option>
-                                    <optgroup label="PREINFANTIL">
-                                        <option value="Atlético A">Atlético A</option>
-                                        <option value="Atlético B">Atlético B</option>
-                                        <option value="Atlético C">Atlético C</option>
-                                        <option value="Azulejos del Hatillo B">Azulejos del Hatillo B</option>
-                                        <option value="Blue Jays A">Blue Jays A</option>
-                                        <option value="Bravos 16 gris">Bravos 16 gris</option>
-                                        <option value="Bravos 16 Vinotinto">Bravos 16 Vinotinto</option>
-                                        <option value="Bravos de Caricuao B">Bravos de Caricuao B</option>
-                                        <option value="Bravos de Miranda A">Bravos de Miranda A</option>
-                                        <option value="Cachorros de coche B">Cachorros de coche B</option>
-                                        <option value="Cardenales B">Cardenales B</option>
-                                        <option value="Cardenalitos B">Cardenalitos B</option>
-                                        <option value="Caribeans kids A">Caribeans kids A</option>
-                                        <option value="Caribes Tribu B">Caribes Tribu B</option>
-                                        <option value="Dmapro B">Dmapro B</option>
-                                        <option value="Dodgers A">Dodgers A</option>
-                                        <option value="Dodgers B">Dodgers B</option>
-                                        <option value="Doraya B">Doraya B</option>
-                                        <option value="Huracanes A">Huracanes A</option>
-                                        <option value="Incas B">Incas B</option>
-                                        <option value="La urbina B">La urbina B</option>
-                                        <option value="Las minas A">Las minas A</option>
-                                        <option value="Las piedritas A">Las piedritas A</option>
-                                        <option value="Las piedritas B">Las piedritas B</option>
-                                        <option value="Las Piedritas C">Las Piedritas C</option>
-                                        <option value="Lion Kids A">Lion Kids A</option>
-                                        <option value="Lion kids B">Lion kids B</option>
-                                        <option value="Parque Miranda A">Parque Miranda A</option>
-                                        <option value="Parque Miranda A1">Parque Miranda A1</option>
-                                        <option value="Picapiedras B">Picapiedras B</option>
-                                        <option value="Picapiedras C">Picapiedras C</option>
-                                        <option value="Progreso A">Progreso A</option>
-                                        <option value="Ravelo A">Ravelo A</option>
-                                        <option value="San Luis A">San Luis A</option>
-                                        <option value="Santa Fe A">Santa Fe A</option>
-                                        <option value="Santa Fe A1">Santa Fe A1</option>
-                                        <option value="Santa fe B">Santa fe B</option>
-                                        <option value="Selección de Miranda Preparatorio">Selección de Miranda Preparatorio</option>
-                                        <option value="Selección DC preparatorio">Selección DC preparatorio</option>
-                                        <option value="Spartans B">Spartans B</option>
-                                        <option value="Team Sucre A">Team Sucre A</option>
-                                        <option value="Team Sucre B">Team Sucre B</option>
-                                        <option value="Team Sucre C">Team Sucre C</option>
-                                        <option value="Titanes de caricuao A">Titanes de caricuao A</option>
-                                        <option value="Titanes de catia B">Titanes de catia B</option>
-                                    </optgroup>
-                                    <optgroup label="INFANTIL">
-                                        <option value="Ángeles de Baruta A">Ángeles de Baruta A</option>
-                                        <option value="Artilleros B">Artilleros B</option>
-                                        <option value="Atlético A">Atlético A</option>
-                                        <option value="Atlético B">Atlético B</option>
-                                        <option value="Atlético C">Atlético C</option>
-                                        <option value="Azulejos del Hatillo B">Azulejos del Hatillo B</option>
-                                        <option value="Black Dog B">Black Dog B</option>
-                                        <option value="Brancos B">Brancos B</option>
-                                        <option value="Bravos 16 B gris">Bravos 16 B gris</option>
-                                        <option value="Bravos 16 Vinotinto">Bravos 16 Vinotinto</option>
-                                        <option value="Bravos de Caricuao A">Bravos de Caricuao A</option>
-                                        <option value="Bravos de Caricuao B">Bravos de Caricuao B</option>
-                                        <option value="Bravos de Miranda B">Bravos de Miranda B</option>
-                                        <option value="Cachorros de coche A">Cachorros de coche A</option>
-                                        <option value="Caciques de Sucre A">Caciques de Sucre A</option>
-                                        <option value="Cardenales B">Cardenales B</option>
-                                        <option value="Cardenalitos A">Cardenalitos A</option>
-                                        <option value="Caribes tribu A">Caribes tribu A</option>
-                                        <option value="Casiques de Sucre B">Casiques de Sucre B</option>
-                                        <option value="Cobras A">Cobras A</option>
-                                        <option value="Dmpro A">Dmpro A</option>
-                                        <option value="Dodgers A">Dodgers A</option>
-                                        <option value="Dodgers B">Dodgers B</option>
-                                        <option value="Dodgers C">Dodgers C</option>
-                                        <option value="Doraya B">Doraya B</option>
-                                        <option value="Gaudy A">Gaudy A</option>
-                                        <option value="Gigantes A">Gigantes A</option>
-                                        <option value="Incas A">Incas A</option>
-                                        <option value="KV Vargas A">KV Vargas A</option>
-                                        <option value="La urbina A">La urbina A</option>
-                                        <option value="La Urbina B">La Urbina B</option>
-                                        <option value="La Urbina C">La Urbina C</option>
-                                        <option value="Las piedritas A">Las piedritas A</option>
-                                        <option value="Las Piedritas B">Las Piedritas B</option>
-                                        <option value="Las piedritas C">Las piedritas C</option>
-                                        <option value="Lion kids A">Lion kids A</option>
-                                        <option value="Lion Kids B">Lion Kids B</option>
-                                        <option value="Loyola A">Loyola A</option>
-                                        <option value="Mempet B">Mempet B</option>
-                                        <option value="National JC">National JC</option>
-                                        <option value="Parque Miranda A">Parque Miranda A</option>
-                                        <option value="Parque Miranda A 1">Parque Miranda A 1</option>
-                                        <option value="Parque Miranda B">Parque Miranda B</option>
-                                        <option value="Parques Miranda B1">Parques Miranda B1</option>
-                                        <option value="Picapiedras B">Picapiedras B</option>
-                                        <option value="Progreso B">Progreso B</option>
-                                        <option value="Ravelo B">Ravelo B</option>
-                                        <option value="San Francisco LG A">San Francisco LG A</option>
-                                        <option value="Santa Fe A">Santa Fe A</option>
-                                        <option value="Santa Fe B">Santa Fe B</option>
-                                        <option value="Santa Fe B1">Santa Fe B1</option>
-                                        <option value="Spartans B">Spartans B</option>
-                                        <option value="Team sucre A">Team sucre A</option>
-                                        <option value="The Big Hand A">The Big Hand A</option>
-                                    </optgroup>
-                                    <optgroup label="PRE-JUNIOR">
-                                        <option value="Aguilas B">Aguilas B</option>
-                                        <option value="Artilleros B">Artilleros B</option>
-                                        <option value="Atta Boys A">Atta Boys A</option>
-                                        <option value="Atlético A">Atlético A</option>
-                                        <option value="Black Dog B">Black Dog B</option>
-                                        <option value="Bravos 16 A vinotinto">Bravos 16 A vinotinto</option>
-                                        <option value="Bravos 16 B Gris">Bravos 16 B Gris</option>
-                                        <option value="Bravos 16 Marron">Bravos 16 Marron</option>
-                                        <option value="Bravos de Caricuao B">Bravos de Caricuao B</option>
-                                        <option value="Bravos de Miranda A">Bravos de Miranda A</option>
-                                        <option value="Bravos de Miranda B">Bravos de Miranda B</option>
-                                        <option value="Caribes tribu B">Caribes tribu B</option>
-                                        <option value="Caribes tribu B1">Caribes tribu B1</option>
-                                        <option value="Cobras B">Cobras B</option>
-                                        <option value="Dmpro A">Dmpro A</option>
-                                        <option value="Dodgers B">Dodgers B</option>
-                                        <option value="Doraya B">Doraya B</option>
-                                        <option value="Gigantes B">Gigantes B</option>
-                                        <option value="Incas A">Incas A</option>
-                                        <option value="La Urbina A">La Urbina A</option>
-                                        <option value="La Urbina B">La Urbina B</option>
-                                        <option value="Las Piedritas A">Las Piedritas A</option>
-                                        <option value="Las piedritas B">Las piedritas B</option>
-                                        <option value="Lion Kids A">Lion Kids A</option>
-                                        <option value="Lion kids B">Lion kids B</option>
-                                        <option value="Los pandas B">Los pandas B</option>
-                                        <option value="Marlins B">Marlins B</option>
-                                        <option value="On Fire A">On Fire A</option>
-                                        <option value="Panteras B">Panteras B</option>
-                                        <option value="Parque Miranda A">Parque Miranda A</option>
-                                        <option value="Parque Miranda A1">Parque Miranda A1</option>
-                                        <option value="Parque Miranda B">Parque Miranda B</option>
-                                        <option value="Progreso B">Progreso B</option>
-                                        <option value="San Luis A">San Luis A</option>
-                                        <option value="San Luis B">San Luis B</option>
-                                        <option value="Santa Fe A">Santa Fe A</option>
-                                        <option value="Spartans B">Spartans B</option>
-                                        <option value="Team Locura A">Team Locura A</option>
-                                        <option value="Team Sucre A">Team Sucre A</option>
-                                        <option value="Team Sucre B">Team Sucre B</option>
-                                        <option value="The Big Hand A">The Big Hand A</option>
-                                        <option value="Tigres A">Tigres A</option>
-                                        <option value="Titanes de Catia B">Titanes de Catia B</option>
-                                    </optgroup>
-                                    <optgroup label="JUNIOR">
-                                        <option value="Atlético A">Atlético A</option>
-                                        <option value="Atta Boys A">Atta Boys A</option>
-                                        <option value="Black Dog B">Black Dog B</option>
-                                        <option value="Bravos de Miranda B">Bravos de Miranda B</option>
-                                        <option value="Broncos B">Broncos B</option>
-                                        <option value="Caribes Tribu B">Caribes Tribu B</option>
-                                        <option value="Dmpro A">Dmpro A</option>
-                                        <option value="Dmpro B">Dmpro B</option>
-                                        <option value="Dodgers A">Dodgers A</option>
-                                        <option value="Gaudy A">Gaudy A</option>
-                                        <option value="Gran Mariscal B">Gran Mariscal B</option>
-                                        <option value="Ravelo B">Ravelo B</option>
-                                        <option value="Spartans B">Spartans B</option>
-                                        <option value="Team Jr B">Team Jr B</option>
-                                        <option value="The Big Hand B">The Big Hand B</option>
-                                    </optgroup>
-                                    <optgroup label="JUVENIL">
-                                        <option value="Atlético">Atlético</option>
-                                        <option value="Broncos">Broncos</option>
-                                        <option value="Dodgers">Dodgers</option>
-                                        <option value="Spartans">Spartans</option>
-                                        <option value="The Gots">The Gots</option>
-                                    </optgroup>
-                                    <optgroup label="SEMILLERO">
-                                        <option value="Atlético B">Atlético B</option>
-                                        <option value="Blue Jays A">Blue Jays A</option>
-                                        <option value="Bravo 16 B">Bravo 16 B</option>
-                                        <option value="Cardenales A">Cardenales A</option>
-                                        <option value="Dodgers B">Dodgers B</option>
-                                        <option value="Doraya B">Doraya B</option>
-                                        <option value="Las Piedritas A">Las Piedritas A</option>
-                                        <option value="Las piedritas B">Las piedritas B</option>
-                                        <option value="San luis A">San luis A</option>
-                                        <option value="Santa fe A">Santa fe A</option>
-                                        <option value="Team Jr A">Team Jr A</option>
-                                        <option value="Team Jr B">Team Jr B</option>
-                                    </optgroup>
-                                    <optgroup label="PREPARATORIO">
-                                        <option value="Artilleros B">Artilleros B</option>
-                                        <option value="Atletico A">Atletico A</option>
-                                        <option value="Atletico B">Atletico B</option>
-                                        <option value="Bravos 16 A vinotinto">Bravos 16 A vinotinto</option>
-                                        <option value="Bravos 16 Gris">Bravos 16 Gris</option>
-                                        <option value="Bravos de Miranda A">Bravos de Miranda A</option>
-                                        <option value="Cardenales B">Cardenales B</option>
-                                        <option value="Cardenalitos A">Cardenalitos A</option>
-                                        <option value="Cardenalitos B">Cardenalitos B</option>
-                                        <option value="Caribeans kids A">Caribeans kids A</option>
-                                        <option value="Dodgers B">Dodgers B</option>
-                                        <option value="Doraya B">Doraya B</option>
-                                        <option value="Las Minas A">Las Minas A</option>
-                                        <option value="Las Piedritas A">Las Piedritas A</option>
-                                        <option value="Las Piedritas B">Las Piedritas B</option>
-                                        <option value="Las Piedritas C">Las Piedritas C</option>
-                                        <option value="Lion kids A">Lion kids A</option>
-                                        <option value="Parque Miranda A">Parque Miranda A</option>
-                                        <option value="Parque Miranda B">Parque Miranda B</option>
-                                        <option value="Picapiedras B">Picapiedras B</option>
-                                        <option value="Raptors B">Raptors B</option>
-                                        <option value="San luis A">San luis A</option>
-                                        <option value="San luis B">San luis B</option>
-                                        <option value="Team Jr A">Team Jr A</option>
-                                        <option value="Team Sucre A">Team Sucre A</option>
-                                        <option value="Team Sucre B">Team Sucre B</option>
-                                        <option value="The big Hand B">The big Hand B</option>
-                                        <option value="The Sea Dog B">The Sea Dog B</option>
-                                    </optgroup>
                                     <option value="CUSTOM">✍️ Escribir otro nombre...</option>
                                 </select>
                                 <input type="text" id="team2-custom" oninput="updateLiveSummary()" placeholder="Escriba el nombre del equipo..."
@@ -1112,10 +714,49 @@
             }
         };
 
+        function normalizeStr(str) {
+            if (!str) return '';
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+        }
+
+        // Obtiene la lista estricta de equipos según Categoría, Nivel y Grupo
+        function getFilteredTeams(cat, lvl, grp) {
+            let teams = [];
+
+            const collectFromCategory = (catData) => {
+                Object.keys(catData).forEach(lKey => {
+                    // Si se seleccionó nivel, debe coincidir exactamente
+                    if (!lvl || lvl === lKey) {
+                        const lvlData = catData[lKey];
+                        Object.keys(lvlData).forEach(gKey => {
+                            // Si se seleccionó grupo, debe coincidir exactamente
+                            if (!grp || grp === gKey) {
+                                teams = teams.concat(lvlData[gKey]);
+                            } else if (!grp && gKey === 'General') {
+                                teams = teams.concat(lvlData[gKey]);
+                            }
+                        });
+                    }
+                });
+            };
+
+            if (cat && TOURNAMENT_DATA[cat]) {
+                collectFromCategory(TOURNAMENT_DATA[cat]);
+            } else {
+                // Si aún no ha seleccionado categoría, busca en todas las categorías respetando Nivel y Grupo
+                Object.values(TOURNAMENT_DATA).forEach(catData => {
+                    collectFromCategory(catData);
+                });
+            }
+
+            return Array.from(new Set(teams)).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+        }
+
+        let currentAvailableTeams = [];
+
         function onCategoryChange() {
             const cat = document.getElementById('match-category').value;
             const levelSelect = document.getElementById('match-level');
-            const groupSelect = document.getElementById('match-group');
             const currentLvl = levelSelect.value;
 
             levelSelect.innerHTML = '<option value="">-- Sin Nivel / Opcional --</option>';
@@ -1138,11 +779,19 @@
                 });
                 if (currentLvl) levelSelect.value = currentLvl;
             }
-            onLevelChange();
+
+            updateGroupOptions();
+            populateTeamsDropdown();
             updateLiveSummary();
         }
 
         function onLevelChange() {
+            updateGroupOptions();
+            populateTeamsDropdown();
+            updateLiveSummary();
+        }
+
+        function updateGroupOptions() {
             const cat = document.getElementById('match-category').value;
             const lvl = document.getElementById('match-level').value;
             const groupSelect = document.getElementById('match-group');
@@ -1150,8 +799,8 @@
 
             groupSelect.innerHTML = '<option value="">-- Sin Grupo / Opcional --</option>';
 
+            let groups = new Set();
             if (cat && TOURNAMENT_DATA[cat]) {
-                let groups = new Set();
                 if (lvl && TOURNAMENT_DATA[cat][lvl]) {
                     Object.keys(TOURNAMENT_DATA[cat][lvl]).forEach(g => {
                         if (g !== 'General') groups.add(g);
@@ -1163,22 +812,26 @@
                         });
                     });
                 }
-                if (groups.size > 0) {
-                    groups.forEach(grp => {
-                        const opt = document.createElement('option');
-                        opt.value = grp;
-                        opt.innerText = grp;
-                        groupSelect.appendChild(opt);
-                    });
-                } else {
-                    ['Grupo A', 'Grupo B', 'Grupo C', 'Grupo D'].forEach(grp => {
-                        const opt = document.createElement('option');
-                        opt.value = grp;
-                        opt.innerText = grp;
-                        groupSelect.appendChild(opt);
-                    });
+            } else if (lvl) {
+                Object.values(TOURNAMENT_DATA).forEach(catObj => {
+                    if (catObj[lvl]) {
+                        Object.keys(catObj[lvl]).forEach(g => {
+                            if (g !== 'General') groups.add(g);
+                        });
+                    }
+                });
+            }
+
+            if (groups.size > 0) {
+                Array.from(groups).sort().forEach(grp => {
+                    const opt = document.createElement('option');
+                    opt.value = grp;
+                    opt.innerText = grp;
+                    groupSelect.appendChild(opt);
+                });
+                if (groups.has(currentGrp)) {
+                    groupSelect.value = currentGrp;
                 }
-                if (currentGrp) groupSelect.value = currentGrp;
             } else {
                 ['Grupo A', 'Grupo B', 'Grupo C', 'Grupo D'].forEach(grp => {
                     const opt = document.createElement('option');
@@ -1188,7 +841,6 @@
                 });
                 if (currentGrp) groupSelect.value = currentGrp;
             }
-            onGroupChange();
         }
 
         function onGroupChange() {
@@ -1197,71 +849,84 @@
         }
 
         function populateTeamsDropdown() {
-            const cat = document.getElementById('match-category').value;
-            const lvl = document.getElementById('match-level').value;
-            const grp = document.getElementById('match-group').value;
+            const cat = document.getElementById('match-category').value.trim();
+            const lvl = document.getElementById('match-level').value.trim();
+            const grp = document.getElementById('match-group').value.trim();
 
-            ['team1', 'team2'].forEach(prefix => {
-                const select = document.getElementById(`${prefix}-select`);
-                const currentVal = select.value;
+            currentAvailableTeams = getFilteredTeams(cat, lvl, grp);
 
-                select.innerHTML = '<option value="">-- Seleccione Equipo --</option>';
+            renderTeamSelect('team1');
+            renderTeamSelect('team2');
+        }
 
-                if (cat && TOURNAMENT_DATA[cat]) {
-                    let teams = [];
-                    const catData = TOURNAMENT_DATA[cat];
-                    Object.keys(catData).forEach(lKey => {
-                        if (!lvl || lvl === lKey) {
-                            const lvlData = catData[lKey];
-                            Object.keys(lvlData).forEach(gKey => {
-                                if (!grp || grp === gKey || gKey === 'General') {
-                                    teams = teams.concat(lvlData[gKey]);
-                                }
-                            });
-                        }
-                    });
-                    const uniqueTeams = Array.from(new Set(teams)).sort();
-                    uniqueTeams.forEach(team => {
-                        const opt = document.createElement('option');
-                        opt.value = team;
-                        opt.innerText = team;
-                        select.appendChild(opt);
-                    });
-                } else {
-                    // SI NO SELECCIONÓ CATEGORÍA, SALEN TODOS LOS EQUIPOS DE TODAS LAS CATEGORÍAS
-                    Object.keys(TOURNAMENT_DATA).forEach(catName => {
-                        let catTeams = [];
-                        const catData = TOURNAMENT_DATA[catName];
-                        Object.values(catData).forEach(lvlData => {
-                            Object.values(lvlData).forEach(teamList => {
-                                catTeams = catTeams.concat(teamList);
-                            });
-                        });
-                        const uniqueCatTeams = Array.from(new Set(catTeams)).sort();
-                        if (uniqueCatTeams.length > 0) {
-                            const optgroup = document.createElement('optgroup');
-                            optgroup.label = `--- ${catName.toUpperCase()} ---`;
-                            uniqueCatTeams.forEach(team => {
-                                const opt = document.createElement('option');
-                                opt.value = team;
-                                opt.innerText = team;
-                                optgroup.appendChild(opt);
-                            });
-                            select.appendChild(optgroup);
-                        }
-                    });
-                }
+        function renderTeamSelect(prefix) {
+            const select = document.getElementById(`${prefix}-select`);
+            if (!select) return;
+            const searchInput = document.getElementById(`${prefix}-search`);
+            const query = searchInput ? normalizeStr(searchInput.value) : '';
+            const countBadge = document.getElementById(`${prefix}-count-badge`);
+            const currentVal = select.value;
 
-                // Opción para escribir equipo manual
-                const customOpt = document.createElement('option');
-                customOpt.value = 'CUSTOM';
-                customOpt.innerText = '✍️ Escribir otro nombre...';
-                select.appendChild(customOpt);
+            let displayTeams = currentAvailableTeams;
+            if (query) {
+                displayTeams = currentAvailableTeams.filter(t => normalizeStr(t).includes(query));
+            }
 
-                if (currentVal) {
-                    select.value = currentVal;
-                }
+            if (countBadge) {
+                countBadge.innerText = `${displayTeams.length} disp.`;
+            }
+
+            select.innerHTML = '';
+
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = '';
+            if (displayTeams.length === 0) {
+                defaultOpt.innerText = query ? '❌ No coincide ningún equipo con la búsqueda' : '❌ Sin equipos en este nivel/grupo';
+            } else {
+                defaultOpt.innerText = `-- Seleccione Equipo (${displayTeams.length} disponible${displayTeams.length === 1 ? '' : 's'}) --`;
+            }
+            select.appendChild(defaultOpt);
+
+            displayTeams.forEach(team => {
+                const opt = document.createElement('option');
+                opt.value = team;
+                opt.innerText = team;
+                select.appendChild(opt);
             });
+
+            // Opción para escribir equipo manual
+            const customOpt = document.createElement('option');
+            customOpt.value = 'CUSTOM';
+            customOpt.innerText = '✍️ Escribir otro nombre...';
+            select.appendChild(customOpt);
+
+            if (currentVal && (displayTeams.includes(currentVal) || currentVal === 'CUSTOM')) {
+                select.value = currentVal;
+            } else if (query && displayTeams.length === 1) {
+                select.value = displayTeams[0];
+            }
+        }
+
+        function filterTeamSearch(prefix, query) {
+            const clearBtn = document.getElementById(`${prefix}-search-clear`);
+            if (clearBtn) {
+                if (query.trim()) {
+                    clearBtn.classList.remove('hidden');
+                } else {
+                    clearBtn.classList.add('hidden');
+                }
+            }
+            renderTeamSelect(prefix);
+            handleTeamSelect(prefix);
+        }
+
+        function clearTeamSearch(prefix) {
+            const searchInput = document.getElementById(`${prefix}-search`);
+            const clearBtn = document.getElementById(`${prefix}-search-clear`);
+            if (searchInput) searchInput.value = '';
+            if (clearBtn) clearBtn.classList.add('hidden');
+            renderTeamSelect(prefix);
+            handleTeamSelect(prefix);
         }
 
         function initApp() {
@@ -1283,6 +948,8 @@
 
                 if (document.getElementById('match-category').value) {
                     onCategoryChange();
+                } else {
+                    populateTeamsDropdown();
                 }
                 updateLiveSummary();
             } catch(err) {
@@ -1720,6 +1387,8 @@
                 removePhoto();
                 removeReceipt('team1');
                 removeReceipt('team2');
+                clearTeamSearch('team1');
+                clearTeamSearch('team2');
                 document.getElementById('team1-pitchers-container').innerHTML = '';
                 document.getElementById('team2-pitchers-container').innerHTML = '';
                 document.getElementById('team1-catchers-container').innerHTML = '';
@@ -1732,6 +1401,7 @@
                 handleTeamSelect('team2');
                 setResultMode('normal');
                 document.getElementById('match-date').value = new Date().toISOString().split('T')[0];
+                populateTeamsDropdown();
                 updateLiveSummary();
             }
         }
@@ -1750,6 +1420,8 @@
                 removePhoto();
                 removeReceipt('team1');
                 removeReceipt('team2');
+                clearTeamSearch('team1');
+                clearTeamSearch('team2');
                 document.getElementById('team1-pitchers-container').innerHTML = '';
                 document.getElementById('team2-pitchers-container').innerHTML = '';
                 document.getElementById('team1-catchers-container').innerHTML = '';
@@ -1762,6 +1434,7 @@
                 handleTeamSelect('team2');
                 setResultMode('normal');
                 document.getElementById('match-date').value = new Date().toISOString().split('T')[0];
+                populateTeamsDropdown();
                 updateLiveSummary();
             }
         }
@@ -1783,8 +1456,11 @@
             document.getElementById('match-number').value = item.matchNumber || '';
             document.getElementById('match-date').value = item.date || new Date().toISOString().split('T')[0];
             document.getElementById('match-category').value = item.category || '';
-            document.getElementById('match-level').value = item.level || '';
-            document.getElementById('match-group').value = item.group || '';
+            onCategoryChange();
+            if (item.level) document.getElementById('match-level').value = item.level;
+            onLevelChange();
+            if (item.group) document.getElementById('match-group').value = item.group;
+            onGroupChange();
             document.getElementById('match-field').value = item.field || '';
 
             // 2. Tipo de resultado
