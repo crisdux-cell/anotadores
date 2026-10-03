@@ -249,14 +249,21 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nivel (Opcional)</label>
                             <select id="match-level" onchange="onLevelChange()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-800 outline-none text-sm bg-white transition">
-                                <option value="">-- Sin Nivel / Todos --</option>
+                                <option value="">-- Sin Nivel / Opcional --</option>
+                                <option value="Nivel A">Nivel A</option>
+                                <option value="Nivel B">Nivel B</option>
+                                <option value="Nivel Modificado">Nivel Modificado</option>
                             </select>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Grupo (Opcional)</label>
                             <select id="match-group" onchange="onGroupChange()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-800 outline-none text-sm bg-white transition">
-                                <option value="">-- Sin Grupo / Todos --</option>
+                                <option value="">-- Sin Grupo / Opcional --</option>
+                                <option value="Grupo A">Grupo A</option>
+                                <option value="Grupo B">Grupo B</option>
+                                <option value="Grupo C">Grupo C</option>
+                                <option value="Grupo D">Grupo D</option>
                             </select>
                         </div>
 
@@ -687,9 +694,9 @@
             const cat = document.getElementById('match-category').value;
             const levelSelect = document.getElementById('match-level');
             const groupSelect = document.getElementById('match-group');
+            const currentLvl = levelSelect.value;
 
-            levelSelect.innerHTML = '<option value="">-- Sin Nivel / Todos --</option>';
-            groupSelect.innerHTML = '<option value="">-- Sin Grupo / Todos --</option>';
+            levelSelect.innerHTML = '<option value="">-- Sin Nivel / Opcional --</option>';
 
             if (cat && TOURNAMENT_DATA[cat]) {
                 const levels = Object.keys(TOURNAMENT_DATA[cat]);
@@ -699,9 +706,15 @@
                     opt.innerText = lvl;
                     levelSelect.appendChild(opt);
                 });
-                if (levels.length === 1 && levels[0] === 'Único') {
-                    levelSelect.value = 'Único';
-                }
+                if (levels.includes(currentLvl)) levelSelect.value = currentLvl;
+            } else {
+                ['Nivel A', 'Nivel B', 'Nivel Modificado'].forEach(lvl => {
+                    const opt = document.createElement('option');
+                    opt.value = lvl;
+                    opt.innerText = lvl;
+                    levelSelect.appendChild(opt);
+                });
+                if (currentLvl) levelSelect.value = currentLvl;
             }
             onLevelChange();
             updateLiveSummary();
@@ -711,8 +724,9 @@
             const cat = document.getElementById('match-category').value;
             const lvl = document.getElementById('match-level').value;
             const groupSelect = document.getElementById('match-group');
+            const currentGrp = groupSelect.value;
 
-            groupSelect.innerHTML = '<option value="">-- Sin Grupo / Todos --</option>';
+            groupSelect.innerHTML = '<option value="">-- Sin Grupo / Opcional --</option>';
 
             if (cat && TOURNAMENT_DATA[cat]) {
                 let groups = new Set();
@@ -727,12 +741,30 @@
                         });
                     });
                 }
-                groups.forEach(grp => {
+                if (groups.size > 0) {
+                    groups.forEach(grp => {
+                        const opt = document.createElement('option');
+                        opt.value = grp;
+                        opt.innerText = grp;
+                        groupSelect.appendChild(opt);
+                    });
+                } else {
+                    ['Grupo A', 'Grupo B', 'Grupo C', 'Grupo D'].forEach(grp => {
+                        const opt = document.createElement('option');
+                        opt.value = grp;
+                        opt.innerText = grp;
+                        groupSelect.appendChild(opt);
+                    });
+                }
+                if (currentGrp) groupSelect.value = currentGrp;
+            } else {
+                ['Grupo A', 'Grupo B', 'Grupo C', 'Grupo D'].forEach(grp => {
                     const opt = document.createElement('option');
                     opt.value = grp;
                     opt.innerText = grp;
                     groupSelect.appendChild(opt);
                 });
+                if (currentGrp) groupSelect.value = currentGrp;
             }
             onGroupChange();
         }
@@ -747,46 +779,64 @@
             const lvl = document.getElementById('match-level').value;
             const grp = document.getElementById('match-group').value;
 
-            let teams = [];
-            if (cat && TOURNAMENT_DATA[cat]) {
-                const catData = TOURNAMENT_DATA[cat];
-                Object.keys(catData).forEach(lKey => {
-                    if (!lvl || lvl === lKey) {
-                        const lvlData = catData[lKey];
-                        Object.keys(lvlData).forEach(gKey => {
-                            if (!grp || grp === gKey || gKey === 'General') {
-                                teams = teams.concat(lvlData[gKey]);
-                            }
-                        });
-                    }
-                });
-            }
-
-            const uniqueTeams = Array.from(new Set(teams)).sort();
-
             ['team1', 'team2'].forEach(prefix => {
                 const select = document.getElementById(`${prefix}-select`);
                 const currentVal = select.value;
 
                 select.innerHTML = '<option value="">-- Seleccione Equipo --</option>';
-                uniqueTeams.forEach(team => {
-                    const opt = document.createElement('option');
-                    opt.value = team;
-                    opt.innerText = team;
-                    select.appendChild(opt);
-                });
+
+                if (cat && TOURNAMENT_DATA[cat]) {
+                    let teams = [];
+                    const catData = TOURNAMENT_DATA[cat];
+                    Object.keys(catData).forEach(lKey => {
+                        if (!lvl || lvl === lKey) {
+                            const lvlData = catData[lKey];
+                            Object.keys(lvlData).forEach(gKey => {
+                                if (!grp || grp === gKey || gKey === 'General') {
+                                    teams = teams.concat(lvlData[gKey]);
+                                }
+                            });
+                        }
+                    });
+                    const uniqueTeams = Array.from(new Set(teams)).sort();
+                    uniqueTeams.forEach(team => {
+                        const opt = document.createElement('option');
+                        opt.value = team;
+                        opt.innerText = team;
+                        select.appendChild(opt);
+                    });
+                } else {
+                    // SI NO SELECCIONÓ CATEGORÍA, SALEN TODOS LOS EQUIPOS DE TODAS LAS CATEGORÍAS
+                    Object.keys(TOURNAMENT_DATA).forEach(catName => {
+                        let catTeams = [];
+                        const catData = TOURNAMENT_DATA[catName];
+                        Object.values(catData).forEach(lvlData => {
+                            Object.values(lvlData).forEach(teamList => {
+                                catTeams = catTeams.concat(teamList);
+                            });
+                        });
+                        const uniqueCatTeams = Array.from(new Set(catTeams)).sort();
+                        if (uniqueCatTeams.length > 0) {
+                            const optgroup = document.createElement('optgroup');
+                            optgroup.label = `--- ${catName.toUpperCase()} ---`;
+                            uniqueCatTeams.forEach(team => {
+                                const opt = document.createElement('option');
+                                opt.value = team;
+                                opt.innerText = team;
+                                optgroup.appendChild(opt);
+                            });
+                            select.appendChild(optgroup);
+                        }
+                    });
+                }
+
+                // Opción para escribir equipo manual
                 const customOpt = document.createElement('option');
                 customOpt.value = 'CUSTOM';
                 customOpt.innerText = '✍️ Escribir otro nombre...';
                 select.appendChild(customOpt);
 
-                if (uniqueTeams.includes(currentVal) || currentVal === 'CUSTOM') {
-                    select.value = currentVal;
-                } else if (currentVal) {
-                    const opt = document.createElement('option');
-                    opt.value = currentVal;
-                    opt.innerText = currentVal;
-                    select.insertBefore(opt, customOpt);
+                if (currentVal) {
                     select.value = currentVal;
                 }
             });
