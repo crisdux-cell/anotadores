@@ -367,13 +367,20 @@
         // Configuración oficial de Supabase Cloud PostgreSQL
         const SUPABASE_URL = 'https://evcoahljwsdwtphvypqh.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_teT-zFXX7mNapKNlFgxIQA_83GjX3wf';
-        const supabase = (window.supabase && window.supabase.createClient) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+        let supabaseClient = null;
+        try {
+            if (window.supabase && typeof window.supabase.createClient === 'function') {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+        } catch(e) {
+            console.warn('Supabase admin init notice:', e);
+        }
 
         // Cargar juegos desde la base de datos PostgreSQL en la nube
         async function fetchCloudGames() {
-            if (!supabase) return;
+            if (!supabaseClient) return;
             try {
-                const { data: juegos, error } = await supabase
+                const { data: juegos, error } = await supabaseClient
                     .from('juegos')
                     .select(`
                         *,
@@ -488,8 +495,8 @@
             fetchCloudGames();
 
             // Suscribirse a cambios en tiempo real desde Supabase Cloud
-            if (supabase) {
-                supabase
+            if (supabaseClient) {
+                supabaseClient
                     .channel('admin-realtime-juegos')
                     .on('postgres_changes', { event: '*', schema: 'public', table: 'juegos' }, (payload) => {
                         fetchCloudGames();

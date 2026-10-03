@@ -648,24 +648,48 @@
         // Configuración oficial de Supabase Cloud PostgreSQL
         const SUPABASE_URL = 'https://evcoahljwsdwtphvypqh.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_teT-zFXX7mNapKNlFgxIQA_83GjX3wf';
-        const supabase = (window.supabase && window.supabase.createClient) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+        let supabaseClient = null;
+        try {
+            if (window.supabase && typeof window.supabase.createClient === 'function') {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+        } catch(e) {
+            console.warn('Supabase init notice:', e);
+        }
 
         let resultMode = 'normal'; // 'normal' or 'tie'
         let mvpPhotoBase64 = '';
 
-        window.onload = function() {
-            // Set today's date
-            document.getElementById('match-date').value = new Date().toISOString().split('T')[0];
+        function initApp() {
+            try {
+                const dateInput = document.getElementById('match-date');
+                if (dateInput && !dateInput.value) {
+                    dateInput.value = new Date().toISOString().split('T')[0];
+                }
 
-            // Add default initial rows for Pitchers and Catchers
-            addPitcherRow('team1');
-            addPitcherRow('team2');
-            addCatcherRow('team1');
-            addCatcherRow('team2');
+                const p1 = document.getElementById('team1-pitchers-container');
+                const p2 = document.getElementById('team2-pitchers-container');
+                const c1 = document.getElementById('team1-catchers-container');
+                const c2 = document.getElementById('team2-catchers-container');
 
-            updateLiveSummary();
-            updateHistoryCountBadge();
-        };
+                if (p1 && p1.children.length === 0) addPitcherRow('team1');
+                if (p2 && p2.children.length === 0) addPitcherRow('team2');
+                if (c1 && c1.children.length === 0) addCatcherRow('team1');
+                if (c2 && c2.children.length === 0) addCatcherRow('team2');
+
+                updateLiveSummary();
+                updateHistoryCountBadge();
+            } catch(err) {
+                console.error('Error during initApp:', err);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
+        window.addEventListener('load', initApp);
 
         /* Toggle Result Mode (Ganado/Perdedor vs Empate) */
         function setResultMode(mode) {
@@ -780,7 +804,8 @@
 
         function getPlayerData(containerId, nameClass, countClass) {
             const container = document.getElementById(containerId);
-            const rows = container.querySelectorAll('& > div');
+            if (!container) return [];
+            const rows = Array.from(container.children);
             const data = [];
             rows.forEach(r => {
                 const name = r.querySelector('.' + nameClass)?.value.trim();
@@ -909,7 +934,7 @@
             localStorage.setItem('copa_san_agustin_reports', JSON.stringify(history));
 
             // Sincronizar en la Nube con Supabase (PostgreSQL)
-            if (supabase) {
+            if (supabaseClient) {
                 try {
                     const isTeam1Winner = parseInt(data.team1Runs) >= parseInt(data.team2Runs);
                     const ganadorNombre = data.resultMode === 'normal' 
@@ -948,7 +973,7 @@
                         anotador_nombre: data.scorerName || 'Anotador Oficial'
                     };
 
-                    const { data: inserted, error: insertErr } = await supabase
+                    const { data: inserted, error: insertErr } = await supabaseClient
                         .from('juegos')
                         .insert([dbJuego])
                         .select();
@@ -983,7 +1008,7 @@
                             });
                         }
                         if (lanzadoresList.length > 0) {
-                            await supabase.from('lanzadores').insert(lanzadoresList);
+                            await supabaseClient.from('lanzadores').insert(lanzadoresList);
                         }
 
                         // Guardar receptores en PostgreSQL
@@ -1013,7 +1038,7 @@
                             });
                         }
                         if (receptoresList.length > 0) {
-                            await supabase.from('receptores').insert(receptoresList);
+                            await supabaseClient.from('receptores').insert(receptoresList);
                         }
                     }
                 } catch(cloudErr) {
