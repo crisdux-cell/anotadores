@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reporte de Anotación - Sexta Edición Copa San Agustín 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2pdf.js for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Supabase JS Client for Cloud PostgreSQL -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            400: '#f3c649',
+                            500: '#d4af37',
+                            600: '#aa820a',
+                            700: '#836202'
+                        },
+                        navy: {
+                            800: '#14213d',
+                            900: '#0d1b2a',
+                            950: '#050c14'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            touch-action: manipulation;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0d1b2a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d4af37;
+            border-radius: 4px;
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(13, 27, 42, 0.08), 0 8px 10px -6px rgba(13, 27, 42, 0.04);
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #f3c649 0%, #d4af37 50%, #aa820a 100%);
+        }
+        .gold-border {
+            border-color: #d4af37;
+        }
+        /* Print rule overrides */
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; color: black !important; }
+        }
+    </style>
+</head>
+<body class="text-slate-800 bg-slate-100 min-h-screen flex flex-col pb-28 md:pb-12">
+
+    <!-- MAIN HEADER WITH EMBEDDED LOGO -->
+    <header class="bg-navy-900 text-white shadow-xl border-b-4 border-gold-500 sticky top-0 z-40 no-print">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <!-- Embedded SVG Logo Emblem representing the Trophy & Copa San Agustín -->
+                <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-gold-400 via-gold-500 to-gold-700 p-0.5 shadow-lg flex-shrink-0">
+                    <div class="w-full h-full bg-navy-950 rounded-[14px] flex flex-col items-center justify-center relative overflow-hidden text-center">
+                        <svg class="w-7 h-7 text-gold-400" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                        </svg>
+                        <span class="text-[7px] font-black text-gold-400 uppercase tracking-tighter leading-none mt-0.5">COPA</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-gold-500 text-navy-950 text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider shadow">SEXTA EDICIÓN</span>
+                        <span class="text-xs text-gold-400 font-bold hidden sm:inline">2026</span>
+                    </div>
+                    <h1 class="text-base sm:text-xl font-black tracking-tight text-white mt-0.5 leading-snug">
+                        Copa San Agustín
+                    </h1>
+                    <p class="text-[11px] text-slate-300 font-medium">Reporte Oficial de Anotación Digital</p>
+                </div>
+            </div>
+
+            <!-- Header Quick Actions -->
+            <div class="flex items-center space-x-2">
+                <button onclick="openHistoryModal()" type="button" class="bg-navy-800 hover:bg-slate-800 border border-gold-500/40 text-gold-400 text-xs px-3.5 py-2 rounded-xl transition flex items-center font-bold shadow-sm">
+                    <i class="fas fa-folder-open mr-1.5 text-sm"></i> 
+                    <span>Historial</span>
+                    <span id="history-badge" class="ml-1.5 bg-gold-500 text-navy-950 px-1.5 py-0.5 rounded-full text-[10px] font-black">0</span>
+                </button>
+                <button onclick="resetForm()" type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-2 rounded-xl transition flex items-center font-medium">
+                    <i class="fas fa-rotate-left mr-1.5"></i> <span class="hidden md:inline">Limpiar</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- QUICK JUMP NAVBAR -->
+        <nav class="bg-navy-950 border-t border-navy-800 px-4 py-2 text-xs overflow-x-auto no-scrollbar">
+            <div class="max-w-7xl mx-auto flex items-center space-x-2 sm:space-x-4 min-w-max">
+                <span class="text-slate-400 font-bold text-[10px] uppercase tracking-wider mr-1">Fases:</span>
+                <a href="#phase1" class="bg-navy-800 hover:bg-gold-500 hover:text-navy-950 text-slate-200 px-3 py-1.5 rounded-lg transition font-semibold flex items-center space-x-1.5 border border-slate-700/50">
+                    <i class="fas fa-trophy text-gold-400 text-xs"></i> <span>Fase 1: Foto y MVP</span>
+                </a>
+                <a href="#phase2" class="bg-navy-800 hover:bg-gold-500 hover:text-navy-950 text-slate-200 px-3 py-1.5 rounded-lg transition font-semibold flex items-center space-x-1.5 border border-slate-700/50">
+                    <i class="fas fa-calendar-alt text-gold-400 text-xs"></i> <span>Fase 2: Datos Partido</span>
+                </a>
+                <a href="#phase3" class="bg-navy-800 hover:bg-gold-500 hover:text-navy-950 text-slate-200 px-3 py-1.5 rounded-lg transition font-semibold flex items-center space-x-1.5 border border-slate-700/50">
+                    <i class="fas fa-baseball-ball text-gold-400 text-xs"></i> <span>Fase 3: Resultados</span>
+                </a>
+                <a href="#phase4" class="bg-navy-800 hover:bg-gold-500 hover:text-navy-950 text-slate-200 px-3 py-1.5 rounded-lg transition font-semibold flex items-center space-x-1.5 border border-slate-700/50">
+                    <i class="fas fa-file-invoice-dollar text-gold-400 text-xs"></i> <span>Fase 4: Pagos e Incidentes</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 pt-5 flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <!-- LEFT COLUMN: CONTINUOUS FORM (3 COLS ON LG) -->
+        <main class="lg:col-span-3 space-y-6">
+
+            <!-- MODO EDICIÓN BANNER -->
+            <div id="edit-banner" class="hidden bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-navy-950 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between shadow-xl border-2 border-amber-600 gap-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-navy-950 text-gold-400 flex items-center justify-center text-lg shadow flex-shrink-0">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-navy-950 text-gold-400 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">Modo Edición</span>
+                            <span id="edit-match-num" class="font-black text-sm text-navy-950">Juego #--</span>
+                        </div>
+                        <p class="text-xs text-navy-950 font-medium mt-0.5">Estás corrigiendo los datos de este juego. Al guardar, se actualizarán en el historial y en el admin.</p>
+                    </div>
+                </div>
+                <button onclick="cancelEditing()" type="button" class="bg-navy-950 hover:bg-slate-900 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow flex items-center justify-center self-end sm:self-auto">
+                    <i class="fas fa-times mr-1.5 text-red-400"></i> Cancelar
+                </button>
+            </div>
+
+            <form id="match-report-form" onsubmit="event.preventDefault(); saveReport();" class="space-y-6">
+
+                <!-- PHASE 1: FOTO Y MVP -->
+                <section id="phase1" class="bg-white rounded-2xl p-4 sm:p-6 card-shadow border border-slate-200 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full gold-gradient"></div>
+                    
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-gold-500 text-navy-950 font-black text-xs px-2.5 py-1 rounded-full uppercase tracking-wider">Fase 1</span>
+                            <h2 class="text-base sm:text-lg font-bold text-navy-900 flex items-center">
+                                <i class="fas fa-award text-gold-500 mr-2"></i> Foto y MVP (Opcional)
+                            </h2>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <!-- Photo Upload Area -->
+                        <div class="sm:col-span-1">
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Foto del Jugador MVP</label>
+                            <div class="relative border-2 border-dashed border-slate-300 rounded-2xl p-4 text-center bg-slate-50 hover:bg-slate-100 transition cursor-pointer flex flex-col items-center justify-center min-h-[160px]"
+                                 onclick="document.getElementById('mvp-photo-input').click()">
+                                
+                                <input type="file" id="mvp-photo-input" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
+                                
+                                <div id="photo-placeholder" class="space-y-2">
+                                    <div class="w-12 h-12 mx-auto rounded-full bg-gold-500/20 text-gold-600 flex items-center justify-center text-xl">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                    <p class="text-xs font-semibold text-slate-700">Seleccionar archivo</p>
+                                    <p class="text-[10px] text-slate-400">O tomar fotografía directamente</p>
+                                </div>
+
+                                <img id="mvp-photo-preview" class="hidden absolute inset-0 w-full h-full object-cover rounded-2xl shadow-sm" alt="MVP Preview">
+                                
+                                <button type="button" id="remove-photo-btn" onclick="event.stopPropagation(); removePhoto();" 
+                                        class="hidden absolute top-2 right-2 bg-red-600 text-white rounded-full w-7 h-7 shadow hover:bg-red-700 text-xs flex items-center justify-center">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- MVP Details -->
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">MVP del Juego (Opcional)</label>
+                            <input type="text" id="mvp-name" placeholder="Nombre completo del Jugador MVP"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-gold-500 focus:border-gold-500 outline-none text-sm font-medium transition">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PHASE 2: DATOS DEL PARTIDO Y UBICACIÓN -->
+                <section id="phase2" class="bg-white rounded-2xl p-4 sm:p-6 card-shadow border border-slate-200 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-navy-800"></div>
+                    
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-navy-800 text-white font-black text-xs px-2.5 py-1 rounded-full uppercase tracking-wider">Fase 2</span>
+                            <h2 class="text-base sm:text-lg font-bold text-navy-900 flex items-center">
+                                <i class="fas fa-map-marker-alt text-navy-800 mr-2"></i> Datos del Partido y Ubicación
+                            </h2>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Número del Juego *</label>
+                            <input type="text" id="match-number" required placeholder="Ej. 02"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-800 outline-none text-sm font-semibold text-navy-900 transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Fecha *</label>
+                            <input type="date" id="match-date" required
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-800 outline-none text-sm font-semibold transition">
+                        </div>
+
+                        <!-- Categoría con opciones exactas -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Categoría *</label>
+                            <select id="match-category" onchange="updateLiveSummary()" required 
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-800 outline-none text-sm font-bold text-navy-900 bg-white transition">
+                                <option value="" disabled selected>-- Seleccione Categoría --</option>
+                                <option value="Semillero">Semillero</option>
+                                <option value="Preparatorio">Preparatorio</option>
+                                <option value="Preinfantil">Preinfantil</option>
+                                <option value="Infantil">Infantil</option>
+                                <option value="Prejunior">Prejunior</option>
+                                <option value="Junior">Junior</option>
+                                <option value="Juvenil">Juvenil</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nivel (Opcional)</label>
+                            <select id="match-level" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-800 outline-none text-sm bg-white transition">
+                                <option value="">-- Sin Nivel / Opcional --</option>
+                                <option value="Nivel A">Nivel A</option>
+                                <option value="Nivel AA">Nivel AA</option>
+                                <option value="Nivel AAA">Nivel AAA</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Grupo (Opcional)</label>
+                            <select id="match-group" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-800 outline-none text-sm bg-white transition">
+                                <option value="">-- Sin Grupo / Opcional --</option>
+                                <option value="Grupo A">Grupo A</option>
+                                <option value="Grupo B">Grupo B</option>
+                                <option value="Grupo C">Grupo C</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Campo / Estadio *</label>
+                            <input type="text" id="match-field" required placeholder="Nombre del campo o estadio"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-800 outline-none text-sm font-medium transition">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PHASE 3: RESULTADOS Y ESTADÍSTICAS -->
+                <section id="phase3" class="bg-white rounded-2xl p-4 sm:p-6 card-shadow border border-slate-200 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-emerald-600"></div>
+                    
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-emerald-600 text-white font-black text-xs px-2.5 py-1 rounded-full uppercase tracking-wider">Fase 3</span>
+                            <h2 class="text-base sm:text-lg font-bold text-navy-900 flex items-center">
+                                <i class="fas fa-chart-bar text-emerald-600 mr-2"></i> Resultados y Estadísticas
+                            </h2>
+                        </div>
+
+                        <!-- Tipo de Resultado Selector -->
+                        <div class="flex items-center space-x-3 bg-slate-100 p-1.5 rounded-xl border border-slate-200 self-start sm:self-auto text-xs font-bold">
+                            <label class="flex items-center space-x-1.5 cursor-pointer px-2 py-1 rounded-lg transition" id="lbl-mode-win">
+                                <input type="radio" name="result-type" value="normal" checked onchange="setResultMode('normal')" class="text-emerald-600 focus:ring-emerald-500">
+                                <span>Ganado / Perdedor</span>
+                            </label>
+                            <label class="flex items-center space-x-1.5 cursor-pointer px-2 py-1 rounded-lg transition" id="lbl-mode-tie">
+                                <input type="radio" name="result-type" value="tie" onchange="setResultMode('tie')" class="text-amber-600 focus:ring-amber-500">
+                                <span>Empate</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- TWO COLUMNS FOR TEAMS -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        <!-- TEAM 1 (Ganador or Equipo A) -->
+                        <div class="bg-slate-50 rounded-2xl p-4 border-2 border-emerald-500/40 space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                <span id="team1-badge" class="bg-emerald-600 text-white font-black text-xs px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                                    Equipo Ganador
+                                </span>
+                                
+                                <!-- Carreras Counter with +/- Buttons -->
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-xs font-black text-slate-500 uppercase">Carreras:</span>
+                                    <button type="button" onclick="adjustRuns('team1', -1)" class="w-7 h-7 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg font-extrabold flex items-center justify-center text-sm transition active:scale-95">-</button>
+                                    <input type="number" id="team1-runs" min="0" value="0" oninput="updateLiveSummary()" 
+                                           class="w-14 py-1 bg-white rounded-lg border-2 border-emerald-600 text-center font-black text-lg text-emerald-800 shadow-sm focus:outline-none">
+                                    <button type="button" onclick="adjustRuns('team1', 1)" class="w-7 h-7 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-extrabold flex items-center justify-center text-sm transition active:scale-95">+</button>
+                                </div>
+                            </div>
+
+                            <!-- Equipo Select or Custom Text -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1" id="team1-label">Equipo Ganador *</label>
+                                <select id="team1-select" onchange="handleTeamSelect('team1')" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 bg-white text-sm font-bold text-slate-800 mb-2">
+                                    <option value="">-- Seleccione Equipo --</option>
+                                    <option value="San Agustín">San Agustín</option>
+                                    <option value="Criollitos A">Criollitos A</option>
+                                    <option value="Criollitos B">Criollitos B</option>
+                                    <option value="Estrellas del Este">Estrellas del Este</option>
+                                    <option value="Piratas de La Guaira">Piratas de La Guaira</option>
+                                    <option value="CUSTOM">✍️ Escribir otro nombre...</option>
+                                </select>
+                                <input type="text" id="team1-custom" oninput="updateLiveSummary()" placeholder="Escriba el nombre del equipo..."
+                                       class="hidden w-full px-3.5 py-2 rounded-xl border-2 border-gold-500 bg-amber-50 focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-bold text-slate-800">
+                            </div>
+
+                            <!-- Pitchers (Lanzadores y Lanzamientos SEPARADOS) -->
+                            <div class="border-t border-slate-200 pt-3 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-xs font-black text-navy-900 uppercase flex items-center">
+                                        <i class="fas fa-baseball-ball mr-1.5 text-emerald-600"></i> Lanzador(es) y Lanzamientos
+                                    </label>
+                                    <button type="button" onclick="addPitcherRow('team1')" class="text-[11px] font-extrabold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-lg transition flex items-center">
+                                        <i class="fas fa-plus mr-1"></i> Agregar
+                                    </button>
+                                </div>
+                                <div id="team1-pitchers-container" class="space-y-2">
+                                    <!-- Dynamic Pitcher Rows -->
+                                </div>
+                            </div>
+
+                            <!-- Catchers (Receptores y Outs SEPARADOS) -->
+                            <div class="border-t border-slate-200 pt-3 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-xs font-black text-navy-900 uppercase flex items-center">
+                                        <i class="fas fa-shield-alt mr-1.5 text-emerald-600"></i> Receptor(es) y Outs
+                                    </label>
+                                    <button type="button" onclick="addCatcherRow('team1')" class="text-[11px] font-extrabold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-lg transition flex items-center">
+                                        <i class="fas fa-plus mr-1"></i> Agregar
+                                    </button>
+                                </div>
+                                <div id="team1-catchers-container" class="space-y-2">
+                                    <!-- Dynamic Catcher Rows -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TEAM 2 (Perdedor or Equipo B) -->
+                        <div class="bg-slate-50 rounded-2xl p-4 border-2 border-slate-300 space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                                <span id="team2-badge" class="bg-slate-600 text-white font-black text-xs px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                                    Equipo Perdedor
+                                </span>
+                                
+                                <!-- Carreras Counter with +/- Buttons -->
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-xs font-black text-slate-500 uppercase">Carreras:</span>
+                                    <button type="button" onclick="adjustRuns('team2', -1)" class="w-7 h-7 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg font-extrabold flex items-center justify-center text-sm transition active:scale-95">-</button>
+                                    <input type="number" id="team2-runs" min="0" value="0" oninput="updateLiveSummary()" 
+                                           class="w-14 py-1 bg-white rounded-lg border-2 border-slate-400 text-center font-black text-lg text-slate-800 shadow-sm focus:outline-none">
+                                    <button type="button" onclick="adjustRuns('team2', 1)" class="w-7 h-7 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-extrabold flex items-center justify-center text-sm transition active:scale-95">+</button>
+                                </div>
+                            </div>
+
+                            <!-- Equipo Select or Custom Text -->
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1" id="team2-label">Equipo Perdedor *</label>
+                                <select id="team2-select" onchange="handleTeamSelect('team2')" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-slate-500 bg-white text-sm font-bold text-slate-800 mb-2">
+                                    <option value="">-- Seleccione Equipo --</option>
+                                    <option value="San Agustín">San Agustín</option>
+                                    <option value="Criollitos A">Criollitos A</option>
+                                    <option value="Criollitos B">Criollitos B</option>
+                                    <option value="Estrellas del Este">Estrellas del Este</option>
+                                    <option value="Piratas de La Guaira">Piratas de La Guaira</option>
+                                    <option value="CUSTOM">✍️ Escribir otro nombre...</option>
+                                </select>
+                                <input type="text" id="team2-custom" oninput="updateLiveSummary()" placeholder="Escriba el nombre del equipo..."
+                                       class="hidden w-full px-3.5 py-2 rounded-xl border-2 border-gold-500 bg-amber-50 focus:ring-2 focus:ring-slate-500 outline-none text-sm font-bold text-slate-800">
+                            </div>
+
+                            <!-- Pitchers (Lanzadores y Lanzamientos SEPARADOS) -->
+                            <div class="border-t border-slate-200 pt-3 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-xs font-black text-navy-900 uppercase flex items-center">
+                                        <i class="fas fa-baseball-ball mr-1.5 text-slate-600"></i> Lanzador(es) y Lanzamientos
+                                    </label>
+                                    <button type="button" onclick="addPitcherRow('team2')" class="text-[11px] font-extrabold text-slate-800 bg-slate-200 hover:bg-slate-300 px-2.5 py-1 rounded-lg transition flex items-center">
+                                        <i class="fas fa-plus mr-1"></i> Agregar
+                                    </button>
+                                </div>
+                                <div id="team2-pitchers-container" class="space-y-2">
+                                    <!-- Dynamic Pitcher Rows -->
+                                </div>
+                            </div>
+
+                            <!-- Catchers (Receptores y Outs SEPARADOS) -->
+                            <div class="border-t border-slate-200 pt-3 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <label class="text-xs font-black text-navy-900 uppercase flex items-center">
+                                        <i class="fas fa-shield-alt mr-1.5 text-slate-600"></i> Receptor(es) y Outs
+                                    </label>
+                                    <button type="button" onclick="addCatcherRow('team2')" class="text-[11px] font-extrabold text-slate-800 bg-slate-200 hover:bg-slate-300 px-2.5 py-1 rounded-lg transition flex items-center">
+                                        <i class="fas fa-plus mr-1"></i> Agregar
+                                    </button>
+                                </div>
+                                <div id="team2-catchers-container" class="space-y-2">
+                                    <!-- Dynamic Catcher Rows -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- PHASE 4: PAGOS E INCIDENCIAS -->
+                <section id="phase4" class="bg-white rounded-2xl p-4 sm:p-6 card-shadow border border-slate-200 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-gold-500"></div>
+                    
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                        <div class="flex items-center space-x-2">
+                            <span class="bg-gold-500 text-navy-950 font-black text-xs px-2.5 py-1 rounded-full uppercase tracking-wider">Fase 4</span>
+                            <h2 class="text-base sm:text-lg font-bold text-navy-900 flex items-center">
+                                <i class="fas fa-file-invoice-dollar text-gold-600 mr-2"></i> Pagos e Incidencias (Opcional)
+                            </h2>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        <!-- Control de Pagos -->
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                            <h3 class="text-xs font-bold text-navy-900 uppercase tracking-wider border-b border-slate-200 pb-2 flex items-center">
+                                <i class="fas fa-check-circle text-emerald-600 mr-1.5"></i> Verificación de Pago de Arbitraje
+                            </h3>
+
+                            <div class="space-y-2 text-xs font-semibold">
+                                <label class="flex items-center space-x-2 cursor-pointer bg-white p-2.5 rounded-lg border border-slate-200">
+                                    <input type="checkbox" id="pay-team1-check" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                    <span>Pagó Equipo Ganador / Equipo A</span>
+                                </label>
+
+                                <div class="pl-6">
+                                    <label class="block text-[11px] text-slate-500 mb-1">Comprobante de Pago Equipo Ganador (Opcional):</label>
+                                    <input type="file" accept="image/*,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-navy-900 file:text-white hover:file:bg-slate-800">
+                                </div>
+
+                                <label class="flex items-center space-x-2 cursor-pointer bg-white p-2.5 rounded-lg border border-slate-200 mt-2">
+                                    <input type="checkbox" id="pay-team2-check" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                    <span>Pagó Equipo Perdedor / Equipo B</span>
+                                </label>
+
+                                <div class="pl-6">
+                                    <label class="block text-[11px] text-slate-500 mb-1">Comprobante de Pago Equipo Perdedor (Opcional):</label>
+                                    <input type="file" accept="image/*,.pdf" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-navy-900 file:text-white hover:file:bg-slate-800">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Incidentes / Protestas -->
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                            <h3 class="text-xs font-bold text-navy-900 uppercase tracking-wider border-b border-slate-200 pb-2 flex items-center">
+                                <i class="fas fa-exclamation-triangle text-amber-500 mr-1.5"></i> Eventos y Protestas
+                            </h3>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Eventos durante el juego:</label>
+                                <select id="match-event-type" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white font-medium">
+                                    <option value="Ninguno">Ninguno</option>
+                                    <option value="Protesta de Juego">Protesta de Juego</option>
+                                    <option value="Expulsión">Expulsión de Técnico / Jugador</option>
+                                    <option value="Lesión">Lesión de Jugador</option>
+                                    <option value="Forfeit">Forfeit</option>
+                                    <option value="Otro">Otro Evento</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Describa el evento o protesta:</label>
+                                <textarea id="match-notes" rows="3" placeholder="Detalles de la incidencia..."
+                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-gold-500 outline-none transition"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Anotador Oficial -->
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Anotador / Oficial del Encuentro *</label>
+                            <input type="text" id="scorer-name" required placeholder="Nombre y Apellido del Anotador"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-gold-500 outline-none text-sm font-semibold text-navy-900 transition">
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- BOTTOM ACTION BUTTONS -->
+                <div class="pt-2 flex flex-col sm:flex-row items-center justify-end gap-3 no-print">
+                    <button type="button" onclick="exportToPDF()" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white font-bold px-6 py-3.5 rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+                        <i class="fas fa-file-pdf text-red-400 text-lg"></i>
+                        <span>Generar Acta PDF</span>
+                    </button>
+                    <button type="submit" class="w-full sm:w-auto gold-gradient text-navy-950 font-black px-8 py-3.5 rounded-xl shadow-xl hover:brightness-105 transition flex items-center justify-center space-x-2 transform active:scale-95">
+                        <i class="fas fa-check-circle text-lg"></i>
+                        <span id="btn-save-text">Guardar Anotación</span>
+                    </button>
+                </div>
+
+            </form>
+
+        </main>
+
+        <!-- RIGHT COLUMN: STICKY LIVE SCOREBOARD (1 COL ON LG) -->
+        <aside class="lg:col-span-1">
+            <div class="lg:sticky lg:top-28 space-y-4">
+                
+                <div class="bg-navy-900 text-white rounded-2xl p-4 card-shadow border-2 border-gold-500/50 relative overflow-hidden">
+                    <div class="flex items-center justify-between pb-3 border-b border-navy-800">
+                        <span class="text-[10px] font-black uppercase text-gold-400 tracking-wider">MARCADOR EN VIVO</span>
+                        <span id="sb-category" class="bg-gold-500/20 text-gold-400 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">Categoría: --</span>
+                    </div>
+
+                    <!-- Teams & Runs Display -->
+                    <div class="py-4 space-y-3">
+                        <div class="flex items-center justify-between bg-navy-950/80 p-2.5 rounded-xl border border-navy-800">
+                            <span id="sb-team1" class="font-bold text-xs truncate max-w-[130px] text-slate-100">Equipo 1</span>
+                            <span id="sb-runs1" class="font-black text-xl text-gold-400 bg-navy-900 px-2.5 py-0.5 rounded-lg border border-gold-500/30">0</span>
+                        </div>
+
+                        <div class="text-center font-black text-[10px] text-slate-500 uppercase tracking-widest">VS</div>
+
+                        <div class="flex items-center justify-between bg-navy-950/80 p-2.5 rounded-xl border border-navy-800">
+                            <span id="sb-team2" class="font-bold text-xs truncate max-w-[130px] text-slate-100">Equipo 2</span>
+                            <span id="sb-runs2" class="font-black text-xl text-slate-200 bg-navy-900 px-2.5 py-0.5 rounded-lg border border-slate-700">0</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-navy-800 text-[11px] text-slate-400 flex items-center justify-between">
+                        <span>Estado:</span>
+                        <span id="sb-status" class="text-emerald-400 font-bold flex items-center">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1"></span> En Edición
+                        </span>
+                    </div>
+
+                    <button onclick="document.getElementById('match-report-form').requestSubmit()" type="button" 
+                            class="w-full mt-4 gold-gradient text-navy-950 text-xs font-black py-2.5 rounded-xl shadow-md hover:brightness-105 transition uppercase tracking-wider">
+                        <i class="fas fa-save mr-1"></i> <span id="sb-save-text">Guardar Anotación</span>
+                    </button>
+                </div>
+
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- HISTORY MODAL -->
+    <div id="history-modal" class="fixed inset-0 bg-navy-950/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-3">
+        <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="bg-navy-900 text-white px-6 py-4 flex items-center justify-between border-b-2 border-gold-500">
+                <h3 class="font-extrabold text-base sm:text-lg flex items-center text-white">
+                    <i class="fas fa-folder-open text-gold-400 mr-2"></i> Historial de Reportes Guardados
+                </h3>
+                <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-white text-xl"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div id="history-list" class="p-4 sm:p-6 overflow-y-auto space-y-3 flex-1">
+                <!-- Loaded dynamically -->
+            </div>
+
+            <div class="bg-slate-100 px-6 py-3 flex justify-between items-center border-t border-slate-200">
+                <button onclick="exportHistoryCSV()" class="text-xs bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3.5 py-2 rounded-xl transition">
+                    <i class="fas fa-file-excel mr-1"></i> Exportar Todo a CSV
+                </button>
+                <button onclick="closeHistoryModal()" class="text-xs bg-slate-700 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-xl">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS NOTIFICATION MODAL -->
+    <div id="success-modal" class="fixed inset-0 bg-navy-950/75 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl text-center space-y-4 border border-slate-200 animate-in fade-in zoom-in duration-200">
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl shadow-inner">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            
+            <div>
+                <h3 class="text-xl font-black text-navy-900" id="success-title">¡Anotación Guardada!</h3>
+                <p class="text-xs text-slate-500 mt-1" id="success-msg">
+                    El resultado ha sido registrado y enviado al Panel de Administración en tiempo real.
+                </p>
+            </div>
+
+            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-left text-xs space-y-1">
+                <div class="flex justify-between font-bold text-slate-700">
+                    <span id="succ-match-label">Juego:</span>
+                    <span id="succ-match-num" class="text-navy-900">--</span>
+                </div>
+                <div class="flex justify-between font-black text-navy-900 text-sm">
+                    <span id="succ-match-score">Equipo 1 vs Equipo 2</span>
+                </div>
+                <div class="flex justify-between text-slate-500">
+                    <span>Anotador:</span>
+                    <span id="succ-match-scorer" class="font-semibold text-slate-700">--</span>
+                </div>
+            </div>
+
+            <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2.5">
+                <button onclick="closeSuccessModal(false); openHistoryModal();" type="button" class="w-full sm:w-auto flex-1 gold-gradient text-navy-950 font-black text-xs py-3 px-4 rounded-xl shadow hover:brightness-105 transition flex items-center justify-center">
+                    <i class="fas fa-folder-open mr-1.5"></i> Ver en Mi Historial
+                </button>
+                <button onclick="closeSuccessModal(true)" type="button" class="w-full sm:w-auto flex-1 bg-navy-900 hover:bg-navy-800 text-white font-bold text-xs py-3 px-4 rounded-xl shadow transition flex items-center justify-center">
+                    <i class="fas fa-plus mr-1.5"></i> Anotar Siguiente Juego
+                </button>
+            </div>
+            <button onclick="closeSuccessModal(false)" type="button" class="text-xs text-slate-400 hover:text-slate-600 font-semibold block mx-auto mt-2">
+                Seguir viendo este juego
+            </button>
+        </div>
+    </div>
+
+    <!-- INVISIBLE PRINT / PDF TEMPLATE -->
+    <div id="pdf-template" class="hidden p-6 bg-white font-sans text-slate-900"></div>
+
+    <script>
+        // Configuración oficial de Supabase Cloud PostgreSQL
+        const SUPABASE_URL = 'https://evcoahljwsdwtphvypqh.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_teT-zFXX7mNapKNlFgxIQA_83GjX3wf';
+        const supabase = (window.supabase && window.supabase.createClient) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+        let resultMode = 'normal'; // 'normal' or 'tie'
+        let mvpPhotoBase64 = '';
+
+        window.onload = function() {
+            // Set today's date
+            document.getElementById('match-date').value = new Date().toISOString().split('T')[0];
+
+            // Add default initial rows for Pitchers and Catchers
+            addPitcherRow('team1');
+            addPitcherRow('team2');
+            addCatcherRow('team1');
+            addCatcherRow('team2');
+
+            updateLiveSummary();
+            updateHistoryCountBadge();
+        };
+
+        /* Toggle Result Mode (Ganado/Perdedor vs Empate) */
+        function setResultMode(mode) {
+            resultMode = mode;
+            const t1Badge = document.getElementById('team1-badge');
+            const t2Badge = document.getElementById('team2-badge');
+            const t1Label = document.getElementById('team1-label');
+            const t2Label = document.getElementById('team2-label');
+
+            if (mode === 'tie') {
+                t1Badge.className = 'bg-amber-600 text-white font-black text-xs px-3 py-1 rounded-full uppercase tracking-wider shadow-sm';
+                t2Badge.className = 'bg-amber-600 text-white font-black text-xs px-3 py-1 rounded-full uppercase tracking-wider shadow-sm';
+                t1Badge.innerText = 'Equipo A (Empate)';
+                t2Badge.innerText = 'Equipo B (Empate)';
+                t1Label.innerText = 'Equipo A *';
+                t2Label.innerText = 'Equipo B *';
+            } else {
+                t1Badge.className = 'bg-emerald-600 text-white font-black text-xs px-3 py-1 rounded-full uppercase tracking-wider shadow-sm';
+                t2Badge.className = 'bg-slate-600 text-white font-black text-xs px-3 py-1 rounded-full uppercase tracking-wider shadow-sm';
+                t1Badge.innerText = 'Equipo Ganador';
+                t2Badge.innerText = 'Equipo Perdedor';
+                t1Label.innerText = 'Equipo Ganador *';
+                t2Label.innerText = 'Equipo Perdedor *';
+            }
+            updateLiveSummary();
+        }
+
+        /* Adjust Runs using +/- buttons */
+        function adjustRuns(teamPrefix, amount) {
+            const input = document.getElementById(`${teamPrefix}-runs`);
+            let val = parseInt(input.value) || 0;
+            val = Math.max(0, val + amount);
+            input.value = val;
+            updateLiveSummary();
+        }
+
+        /* Team Select vs Custom Name Input */
+        function handleTeamSelect(teamPrefix) {
+            const select = document.getElementById(`${teamPrefix}-select`);
+            const customInput = document.getElementById(`${teamPrefix}-custom`);
+
+            if (select.value === 'CUSTOM') {
+                customInput.classList.remove('hidden');
+                customInput.focus();
+            } else {
+                customInput.classList.add('hidden');
+                customInput.value = '';
+            }
+            updateLiveSummary();
+        }
+
+        function getTeamName(teamPrefix) {
+            const select = document.getElementById(`${teamPrefix}-select`);
+            const customInput = document.getElementById(`${teamPrefix}-custom`);
+
+            if (select.value === 'CUSTOM') {
+                return customInput.value.trim() || (teamPrefix === 'team1' ? 'Equipo A' : 'Equipo B');
+            }
+            return select.value || (teamPrefix === 'team1' ? 'Equipo A' : 'Equipo B');
+        }
+
+        /* Dynamic Pitcher Rows (Name + Pitch Count SEPARATED) */
+        function addPitcherRow(teamPrefix, name = '', pitchCount = '') {
+            const container = document.getElementById(`${teamPrefix}-pitchers-container`);
+            const rowId = 'pitcher_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+
+            const div = document.createElement('div');
+            div.id = rowId;
+            div.className = 'flex items-center space-x-2 bg-white p-2 rounded-xl border border-slate-200 shadow-sm text-xs';
+            div.innerHTML = `
+                <input type="text" placeholder="Nombre del Lanzador" value="${name}" 
+                       class="p-name flex-1 px-2.5 py-1.5 rounded-lg border border-slate-300 font-semibold focus:ring-1 focus:ring-gold-500 outline-none">
+                <div class="flex items-center space-x-1">
+                    <span class="text-[10px] font-black text-slate-400 uppercase">Lanz:</span>
+                    <input type="number" min="0" placeholder="0" value="${pitchCount}" 
+                           class="p-count w-16 px-2 py-1.5 rounded-lg border border-slate-300 text-center font-bold text-navy-900">
+                </div>
+                <button type="button" onclick="removeRow('${rowId}')" class="text-red-500 hover:text-red-700 px-1.5 py-1 rounded">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+
+        /* Dynamic Catcher Rows (Name + Outs SEPARATED) */
+        function addCatcherRow(teamPrefix, name = '', outsCount = '') {
+            const container = document.getElementById(`${teamPrefix}-catchers-container`);
+            const rowId = 'catcher_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+
+            const div = document.createElement('div');
+            div.id = rowId;
+            div.className = 'flex items-center space-x-2 bg-white p-2 rounded-xl border border-slate-200 shadow-sm text-xs';
+            div.innerHTML = `
+                <input type="text" placeholder="Nombre Receptor/Catcher" value="${name}" 
+                       class="c-name flex-1 px-2.5 py-1.5 rounded-lg border border-slate-300 font-semibold focus:ring-1 focus:ring-gold-500 outline-none">
+                <div class="flex items-center space-x-1">
+                    <span class="text-[10px] font-black text-slate-400 uppercase">Outs:</span>
+                    <input type="number" min="0" placeholder="0" value="${outsCount}" 
+                           class="c-outs w-16 px-2 py-1.5 rounded-lg border border-slate-300 text-center font-bold text-navy-900">
+                </div>
+                <button type="button" onclick="removeRow('${rowId}')" class="text-red-500 hover:text-red-700 px-1.5 py-1 rounded">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeRow(rowId) {
+            const row = document.getElementById(rowId);
+            if (row) row.remove();
+        }
+
+        function getPlayerData(containerId, nameClass, countClass) {
+            const container = document.getElementById(containerId);
+            const rows = container.querySelectorAll('& > div');
+            const data = [];
+            rows.forEach(r => {
+                const name = r.querySelector('.' + nameClass)?.value.trim();
+                const count = r.querySelector('.' + countClass)?.value || '0';
+                if (name) {
+                    data.push({ name, count });
+                }
+            });
+            return data;
+        }
+
+        /* Photo Handler */
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                mvpPhotoBase64 = e.target.result;
+                const img = document.getElementById('mvp-photo-preview');
+                const placeholder = document.getElementById('photo-placeholder');
+                const removeBtn = document.getElementById('remove-photo-btn');
+
+                img.src = mvpPhotoBase64;
+                img.classList.remove('hidden');
+                placeholder.classList.add('opacity-0');
+                removeBtn.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto() {
+            mvpPhotoBase64 = '';
+            document.getElementById('mvp-photo-input').value = '';
+            document.getElementById('mvp-photo-preview').classList.add('hidden');
+            document.getElementById('photo-placeholder').classList.remove('opacity-0');
+            document.getElementById('remove-photo-btn').classList.add('hidden');
+        }
+
+        /* Update Live Sidebar Scoreboard */
+        function updateLiveSummary() {
+            const name1 = getTeamName('team1');
+            const name2 = getTeamName('team2');
+            const runs1 = document.getElementById('team1-runs').value || '0';
+            const runs2 = document.getElementById('team2-runs').value || '0';
+            const cat = document.getElementById('match-category').value || '--';
+
+            document.getElementById('sb-team1').innerText = name1;
+            document.getElementById('sb-team2').innerText = name2;
+            document.getElementById('sb-runs1').innerText = runs1;
+            document.getElementById('sb-runs2').innerText = runs2;
+            document.getElementById('sb-category').innerText = `Categoría: ${cat}`;
+        }
+
+        /* Collect full form object */
+        function collectData() {
+            return {
+                id: 'REP-' + Date.now(),
+                timestamp: new Date().toISOString(),
+                mvpName: document.getElementById('mvp-name').value,
+                mvpStats: '',
+                mvpPhoto: mvpPhotoBase64,
+
+                matchNumber: document.getElementById('match-number').value,
+                date: document.getElementById('match-date').value,
+                category: document.getElementById('match-category').value,
+                level: document.getElementById('match-level').value,
+                group: document.getElementById('match-group').value,
+                field: document.getElementById('match-field').value,
+
+                resultMode: resultMode,
+                team1Name: getTeamName('team1'),
+                team1Runs: document.getElementById('team1-runs').value,
+                team1Pitchers: getPlayerData('team1-pitchers-container', 'p-name', 'p-count'),
+                team1Catchers: getPlayerData('team1-catchers-container', 'c-name', 'c-outs'),
+
+                team2Name: getTeamName('team2'),
+                team2Runs: document.getElementById('team2-runs').value,
+                team2Pitchers: getPlayerData('team2-pitchers-container', 'p-name', 'p-count'),
+                team2Catchers: getPlayerData('team2-catchers-container', 'c-name', 'c-outs'),
+
+                payTeam1: document.getElementById('pay-team1-check').checked,
+                payTeam2: document.getElementById('pay-team2-check').checked,
+                eventType: document.getElementById('match-event-type').value,
+                notes: document.getElementById('match-notes').value,
+                scorerName: document.getElementById('scorer-name').value
+            };
+        }
+
+        let editingGameId = null;
+
+        function updateHistoryCountBadge() {
+            try {
+                const history = JSON.parse(localStorage.getItem('copa_san_agustin_reports') || '[]');
+                const badge = document.getElementById('history-badge');
+                if (badge) badge.innerText = history.length;
+            } catch(e) {}
+        }
+
+        /* Save Report (Saves locally & synchronizes to Supabase Cloud) */
+        async function saveReport() {
+            const data = collectData();
+            let history = JSON.parse(localStorage.getItem('copa_san_agustin_reports') || '[]');
+
+            if (editingGameId) {
+                // Update existing game in local storage
+                const idx = history.findIndex(g => g.id === editingGameId);
+                if (idx !== -1) {
+                    data.id = editingGameId;
+                    data.modules = history[idx].modules || [];
+                    history[idx] = data;
+                } else {
+                    history.unshift(data);
+                }
+                editingGameId = null;
+                const banner = document.getElementById('edit-banner');
+                if (banner) banner.classList.add('hidden');
+                const btnText = document.getElementById('btn-save-text');
+                if (btnText) btnText.innerText = 'Guardar Anotación';
+                const sbBtnText = document.getElementById('sb-save-text');
+                if (sbBtnText) sbBtnText.innerText = 'Guardar Anotación';
+            } else {
+                history.unshift(data);
+            }
+
+            localStorage.setItem('copa_san_agustin_reports', JSON.stringify(history));
+
+            // Sincronizar en la Nube con Supabase (PostgreSQL)
+            if (supabase) {
+                try {
+                    const isTeam1Winner = parseInt(data.team1Runs) >= parseInt(data.team2Runs);
+                    const ganadorNombre = data.resultMode === 'normal' 
+                        ? (isTeam1Winner ? data.team1Name : data.team2Name) 
+                        : data.team1Name;
+                    const perdedorNombre = data.resultMode === 'normal' 
+                        ? (isTeam1Winner ? data.team2Name : data.team1Name) 
+                        : data.team2Name;
+                    const carrerasGanador = data.resultMode === 'normal' 
+                        ? (isTeam1Winner ? (parseInt(data.team1Runs) || 0) : (parseInt(data.team2Runs) || 0)) 
+                        : (parseInt(data.team1Runs) || 0);
+                    const carrerasPerdedor = data.resultMode === 'normal' 
+                        ? (isTeam1Winner ? (parseInt(data.team2Runs) || 0) : (parseInt(data.team1Runs) || 0)) 
+                        : (parseInt(data.team2Runs) || 0);
+
+                    const dbJuego = {
+                        numero_juego: data.matchNumber || 'S/N',
+                        fecha: data.date || new Date().toISOString().split('T')[0],
+                        categoria: data.category || 'Semillero',
+                        nivel: data.level || '',
+                        grupo: data.group || '',
+                        campo: data.field || '',
+                        tipo_resultado: data.resultMode === 'normal' ? 'Ganado / Perdedor' : 'Empate',
+                        equipo_ganador: ganadorNombre,
+                        carreras_ganador: carrerasGanador,
+                        equipo_perdedor: perdedorNombre,
+                        carreras_perdedor: carrerasPerdedor,
+                        pago_ganador: isTeam1Winner ? !!data.payTeam1 : !!data.payTeam2,
+                        comprobante_ganador_url: isTeam1Winner ? (data.receiptTeam1 || '') : (data.receiptTeam2 || ''),
+                        pago_perdedor: isTeam1Winner ? !!data.payTeam2 : !!data.payTeam1,
+                        comprobante_perdedor_url: isTeam1Winner ? (data.receiptTeam2 || '') : (data.receiptTeam1 || ''),
+                        evento_tipo: data.eventType || 'Ninguno',
+                        descripcion_evento: data.notes || '',
+                        mvp_nombre: data.mvpName || '',
+                        mvp_foto_url: data.mvpPhoto || '',
+                        anotador_nombre: data.scorerName || 'Anotador Oficial'
+                    };
+
+                    const { data: inserted, error: insertErr } = await supabase
+                        .from('juegos')
+                        .insert([dbJuego])
+                        .select();
+
+                    if (!insertErr && inserted && inserted.length > 0) {
+                        const newJuegoId = inserted[0].id;
+                        
+                        // Guardar lanzadores en PostgreSQL
+                        const lanzadoresList = [];
+                        if (Array.isArray(data.team1Pitchers)) {
+                            data.team1Pitchers.forEach(p => {
+                                if (p.name && p.name.trim()) {
+                                    lanzadoresList.push({
+                                        juego_id: newJuegoId,
+                                        equipo_rol: isTeam1Winner ? 'GANADOR' : 'PERDEDOR',
+                                        nombre: p.name.trim(),
+                                        lanzamientos: parseInt(p.count) || 0
+                                    });
+                                }
+                            });
+                        }
+                        if (Array.isArray(data.team2Pitchers)) {
+                            data.team2Pitchers.forEach(p => {
+                                if (p.name && p.name.trim()) {
+                                    lanzadoresList.push({
+                                        juego_id: newJuegoId,
+                                        equipo_rol: isTeam1Winner ? 'PERDEDOR' : 'GANADOR',
+                                        nombre: p.name.trim(),
+                                        lanzamientos: parseInt(p.count) || 0
+                                    });
+                                }
+                            });
+                        }
+                        if (lanzadoresList.length > 0) {
+                            await supabase.from('lanzadores').insert(lanzadoresList);
+                        }
+
+                        // Guardar receptores en PostgreSQL
+                        const receptoresList = [];
+                        if (Array.isArray(data.team1Catchers)) {
+                            data.team1Catchers.forEach(c => {
+                                if (c.name && c.name.trim()) {
+                                    receptoresList.push({
+                                        juego_id: newJuegoId,
+                                        equipo_rol: isTeam1Winner ? 'GANADOR' : 'PERDEDOR',
+                                        nombre: c.name.trim(),
+                                        outs: parseInt(c.count) || 0
+                                    });
+                                }
+                            });
+                        }
+                        if (Array.isArray(data.team2Catchers)) {
+                            data.team2Catchers.forEach(c => {
+                                if (c.name && c.name.trim()) {
+                                    receptoresList.push({
+                                        juego_id: newJuegoId,
+                                        equipo_rol: isTeam1Winner ? 'PERDEDOR' : 'GANADOR',
+                                        nombre: c.name.trim(),
+                                        outs: parseInt(c.count) || 0
+                                    });
+                                }
+                            });
+                        }
+                        if (receptoresList.length > 0) {
+                            await supabase.from('receptores').insert(receptoresList);
+                        }
+                    }
+                } catch(cloudErr) {
+                    console.warn('Sincronización en la nube en segundo plano:', cloudErr);
+                }
+            }
+
+            // Notificar localmente por si la pestaña admin está abierta en el mismo navegador
+            try {
+                const bc = new BroadcastChannel('copa_san_agustin_channel');
+                bc.postMessage({ type: 'NEW_REPORT_SUBMITTED', matchNumber: data.matchNumber });
+            } catch(e) {}
+
+            // Populate and show success modal
+            document.getElementById('succ-match-label').innerText = `Juego N° ${data.matchNumber || '--'}`;
+            document.getElementById('succ-match-num').innerText = `${data.category || ''}`;
+            document.getElementById('succ-match-score').innerText = `${data.team1Name} (${data.team1Runs}) vs ${data.team2Name} (${data.team2Runs})`;
+            document.getElementById('succ-match-scorer').innerText = data.scorerName || 'Oficial';
+            document.getElementById('success-title').innerText = '¡Anotación Guardada!';
+            document.getElementById('success-msg').innerText = 'El resultado ha sido registrado y sincronizado en la nube en tiempo real.';
+            document.getElementById('success-modal').classList.remove('hidden');
+
+            updateHistoryCountBadge();
+        }
+
+        function closeSuccessModal(reset = false) {
+            document.getElementById('success-modal').classList.add('hidden');
+            if (reset) {
+                document.getElementById('match-report-form').reset();
+                removePhoto();
+                document.getElementById('team1-pitchers-container').innerHTML = '';
+                document.getElementById('team2-pitchers-container').innerHTML = '';
+                document.getElementById('team1-catchers-container').innerHTML = '';
+                document.getElementById('team2-catchers-container').innerHTML = '';
+                addPitcherRow('team1');
+                addPitcherRow('team2');
+                addCatcherRow('team1');
+                addCatcherRow('team2');
+                handleTeamSelect('team1');
+                handleTeamSelect('team2');
+                setResultMode('normal');
+                document.getElementById('match-date').value = new Date().toISOString().split('T')[0];
+                updateLiveSummary();
+            }
+        }
+
+        function resetForm() {
+            if (confirm('¿Desea restablecer todos los campos del formulario?')) {
+                editingGameId = null;
+                const banner = document.getElementById('edit-banner');
+                if (banner) banner.classList.add('hidden');
+                const btnText = document.getElementById('btn-save-text');
+                if (btnText) btnText.innerText = 'Guardar Anotación';
+                const sbBtnText = document.getElementById('sb-save-text');
+                if (sbBtnText) sbBtnText.innerText = 'Guardar Anotación';
+
+                document.getElementById('match-report-form').reset();
+                removePhoto();
+                document.getElementById('team1-pitchers-container').innerHTML = '';
+                document.getElementById('team2-pitchers-container').innerHTML = '';
+                document.getElementById('team1-catchers-container').innerHTML = '';
+                document.getElementById('team2-catchers-container').innerHTML = '';
+                addPitcherRow('team1');
+                addPitcherRow('team2');
+                addCatcherRow('team1');
+                addCatcherRow('team2');
+                handleTeamSelect('team1');
+                handleTeamSelect('team2');
+                setResultMode('normal');
+                document.getElementById('match-date').value = new Date().toISOString().split('T')[0];
+                updateLiveSummary();
+            }
+        }
+
+        function cancelEditing() {
+            if (confirm('¿Desea salir del modo edición y descartar los cambios no guardados?')) {
+                resetForm();
+            }
+        }
+
+        function editHistoryItem(idx) {
+            const history = JSON.parse(localStorage.getItem('copa_san_agustin_reports') || '[]');
+            const item = history[idx];
+            if (!item) return;
+
+            editingGameId = item.id || ('REP-' + Date.now());
+
+            // 1. Datos del partido
+            document.getElementById('match-number').value = item.matchNumber || '';
+            document.getElementById('match-date').value = item.date || new Date().toISOString().split('T')[0];
+            document.getElementById('match-category').value = item.category || '';
+            document.getElementById('match-level').value = item.level || '';
+            document.getElementById('match-group').value = item.group || '';
+            document.getElementById('match-field').value = item.field || '';
+
+            // 2. Tipo de resultado
+            setResultMode(item.resultMode || 'normal');
+
+            // 3. Equipo 1
+            const t1Select = document.getElementById('team1-select');
+            const t1Custom = document.getElementById('team1-custom');
+            let t1Found = Array.from(t1Select.options).some(o => o.value === item.team1Name);
+            if (t1Found) {
+                t1Select.value = item.team1Name;
+                t1Custom.classList.add('hidden');
+                t1Custom.value = '';
+            } else {
+                t1Select.value = 'CUSTOM';
+                t1Custom.classList.remove('hidden');
+                t1Custom.value = item.team1Name || '';
+            }
+            document.getElementById('team1-runs').value = item.team1Runs || '0';
+
+            // 4. Equipo 2
+            const t2Select = document.getElementById('team2-select');
+            const t2Custom = document.getElementById('team2-custom');
+            let t2Found = Array.from(t2Select.options).some(o => o.value === item.team2Name);
+            if (t2Found) {
+                t2Select.value = item.team2Name;
+                t2Custom.classList.add('hidden');
+                t2Custom.value = '';
+            } else {
+                t2Select.value = 'CUSTOM';
+                t2Custom.classList.remove('hidden');
+                t2Custom.value = item.team2Name || '';
+            }
+            document.getElementById('team2-runs').value = item.team2Runs || '0';
+
+            // 5. Lanzadores y Receptores
+            document.getElementById('team1-pitchers-container').innerHTML = '';
+            document.getElementById('team2-pitchers-container').innerHTML = '';
+            document.getElementById('team1-catchers-container').innerHTML = '';
+            document.getElementById('team2-catchers-container').innerHTML = '';
+
+            if (item.team1Pitchers && item.team1Pitchers.length > 0) {
+                item.team1Pitchers.forEach(p => addPitcherRow('team1', p.name, p.count));
+            } else {
+                addPitcherRow('team1');
+            }
+
+            if (item.team2Pitchers && item.team2Pitchers.length > 0) {
+                item.team2Pitchers.forEach(p => addPitcherRow('team2', p.name, p.count));
+            } else {
+                addPitcherRow('team2');
+            }
+
+            if (item.team1Catchers && item.team1Catchers.length > 0) {
+                item.team1Catchers.forEach(c => addCatcherRow('team1', c.name, c.count));
+            } else {
+                addCatcherRow('team1');
+            }
+
+            if (item.team2Catchers && item.team2Catchers.length > 0) {
+                item.team2Catchers.forEach(c => addCatcherRow('team2', c.name, c.count));
+            } else {
+                addCatcherRow('team2');
+            }
+
+            // 6. MVP
+            document.getElementById('mvp-name').value = item.mvpName || '';
+            if (item.mvpPhoto) {
+                mvpPhotoBase64 = item.mvpPhoto;
+                const img = document.getElementById('mvp-photo-preview');
+                const placeholder = document.getElementById('photo-placeholder');
+                const removeBtn = document.getElementById('remove-photo-btn');
+                img.src = mvpPhotoBase64;
+                img.classList.remove('hidden');
+                placeholder.classList.add('opacity-0');
+                removeBtn.classList.remove('hidden');
+            } else {
+                removePhoto();
+            }
+
+            // 7. Pagos e incidencias
+            document.getElementById('pay-team1-check').checked = !!item.payTeam1;
+            document.getElementById('pay-team2-check').checked = !!item.payTeam2;
+            document.getElementById('match-event-type').value = item.eventType || 'Ninguno';
+            document.getElementById('match-notes').value = item.notes || '';
+            document.getElementById('scorer-name').value = item.scorerName || '';
+
+            // 8. Activar Banner y cambiar botones
+            updateLiveSummary();
+            closeHistoryModal();
+
+            const banner = document.getElementById('edit-banner');
+            if (banner) {
+                banner.classList.remove('hidden');
+                document.getElementById('edit-match-num').innerText = `Juego #${item.matchNumber || ''}`;
+            }
+
+            const btnText = document.getElementById('btn-save-text');
+            if (btnText) btnText.innerText = 'Actualizar y Guardar Cambios';
+            const sbBtnText = document.getElementById('sb-save-text');
+            if (sbBtnText) sbBtnText.innerText = 'Actualizar Cambios';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openHistoryModal() {
+            const modal = document.getElementById('history-modal');
+            const list = document.getElementById('history-list');
+            const history = JSON.parse(localStorage.getItem('copa_san_agustin_reports') || '[]');
+
+            updateHistoryCountBadge();
+
+            if (history.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-12 text-slate-400">
+                        <i class="fas fa-folder-open text-4xl mb-2 text-slate-300"></i>
+                        <p class="text-sm font-semibold">No se encontraron reportes guardados.</p>
+                        <p class="text-xs text-slate-400 mt-1">Los juegos que guardes aparecerán aquí y podrás editarlos o consultarlos cuando desees.</p>
+                    </div>
+                `;
+            } else {
+                list.innerHTML = history.map((item, idx) => `
+                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:border-gold-500 transition">
+                        <div>
+                            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+                                <span class="bg-navy-900 text-gold-400 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">${item.category}</span>
+                                <span class="text-xs font-bold text-slate-500">Juego #${item.matchNumber} | 📅 ${item.date}</span>
+                                <span class="text-xs text-slate-400 font-medium">Campo: ${item.field}</span>
+                            </div>
+                            <h4 class="font-black text-navy-900 text-base sm:text-lg mt-1">
+                                ${item.team1Name} <span class="text-emerald-700">(${item.team1Runs})</span> vs ${item.team2Name} <span class="text-slate-700">(${item.team2Runs})</span>
+                            </h4>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                Anotador: <b class="text-slate-700">${item.scorerName || 'Oficial'}</b>
+                                ${item.mvpName ? ' • ⭐ MVP: <b class="text-amber-700">' + item.mvpName + '</b>' : ''}
+                            </p>
+                        </div>
+                        <div class="flex items-center space-x-2 self-end sm:self-center">
+                            <button onclick="editHistoryItem(${idx})" class="gold-gradient text-navy-950 hover:brightness-105 px-3.5 py-2 rounded-xl text-xs font-black transition flex items-center shadow-md">
+                                <i class="fas fa-edit mr-1.5"></i> Cargar y Editar
+                            </button>
+                            <button onclick="deleteHistoryItem(${idx})" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-xl text-xs font-bold transition" title="Eliminar registro">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('history-modal').classList.add('hidden');
+        }
+
+        function deleteHistoryItem(idx) {
+            if (confirm('¿Desea eliminar esta anotación del historial?')) {
+                let history = JSON.parse(localStorage.getItem('copa_san_agustin_reports') || '[]');
+                history.splice(idx, 1);
+                localStorage.setItem('copa_san_agustin_reports', JSON.stringify(history));
+                openHistoryModal();
+            }
+        }
+
+        function exportHistoryCSV() {
+            const history = JSON.parse(localStorage.getItem('copa_san_agustin_reports') || '[]');
+            if (history.length === 0) return alert('No hay reportes para exportar');
+
+            let csv = 'Juego,Fecha,Categoria,Campo,Equipo1,Carreras1,Equipo2,Carreras2,MVP,Anotador\n';
+            history.forEach(r => {
+                csv += `"${r.matchNumber}","${r.date}","${r.category}","${r.field}","${r.team1Name}",${r.team1Runs},"${r.team2Name}",${r.team2Runs},"${r.mvpName}","${r.scorerName}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Reportes_CopaSanAgustin_2026.csv`;
+            a.click();
+        }
+
+        function exportToPDF() {
+            const data = collectData();
+            const pdfContainer = document.getElementById('pdf-template');
+
+            pdfContainer.innerHTML = `
+                <div style="font-family: Arial, sans-serif; color: #0d1b2a; padding: 20px; border: 3px solid #d4af37; max-width: 800px; margin: auto;">
+                    
+                    <!-- Header with Branding -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0d1b2a; padding-bottom: 12px; margin-bottom: 12px;">
+                        <div>
+                            <span style="background: #d4af37; color: #0d1b2a; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px;">SEXTA EDICIÓN</span>
+                            <h1 style="font-size: 20px; font-weight: 900; color: #0d1b2a; margin: 4px 0 0 0;">COPA SAN AGUSTÍN 2026</h1>
+                            <p style="font-size: 11px; color: #555; margin: 0;">Planilla Oficial de Anotación y Resultado de Juego</p>
+                        </div>
+                        <div style="text-align: right; font-size: 11px; line-height: 1.4;">
+                            <p style="margin: 0;"><strong>Juego N°:</strong> ${data.matchNumber || 'N/A'}</p>
+                            <p style="margin: 0;"><strong>Categoría:</strong> ${data.category || 'N/A'}</p>
+                            <p style="margin: 0;"><strong>Fecha:</strong> ${data.date}</p>
+                            <p style="margin: 0;"><strong>Campo:</strong> ${data.field || 'N/A'}</p>
+                        </div>
+                    </div>
+
+                    <!-- Scoreboard Table -->
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; text-align: center;">
+                        <thead>
+                            <tr style="background: #0d1b2a; color: #d4af37;">
+                                <th style="padding: 8px; text-align: left;">Equipo</th>
+                                <th style="padding: 8px;">Resultado</th>
+                                <th style="padding: 8px;">Carreras</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #ddd; background: #fdfdfd;">
+                                <td style="padding: 8px; text-align: left; font-weight: bold;">${data.team1Name}</td>
+                                <td style="padding: 8px;">${data.resultMode === 'normal' ? 'Ganador' : 'Empate'}</td>
+                                <td style="padding: 8px; font-weight: bold; font-size: 14px;">${data.team1Runs}</td>
+                            </tr>
+                            <tr style="background: #fdfdfd;">
+                                <td style="padding: 8px; text-align: left; font-weight: bold;">${data.team2Name}</td>
+                                <td style="padding: 8px;">${data.resultMode === 'normal' ? 'Perdedor' : 'Empate'}</td>
+                                <td style="padding: 8px; font-weight: bold; font-size: 14px;">${data.team2Runs}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- MVP Section -->
+                    <div style="margin-top: 15px; border: 1px solid #d4af37; background: #fffdf5; p: 10px; padding: 10px; border-radius: 6px;">
+                        <h3 style="font-size: 12px; font-weight: bold; color: #836202; margin: 0 0 4px 0;">🏆 JUGADOR MÁS VALIOSO (MVP)</h3>
+                        <p style="font-size: 11px; margin: 2px 0;"><strong>Jugador:</strong> ${data.mvpName || 'N/A'}</p>
+                        ${data.mvpStats ? `<p style="font-size: 10px; margin: 2px 0; color: #444;"><strong>Actuación:</strong> ${data.mvpStats}</p>` : ''}
+                    </div>
+
+                    <!-- Pitchers and Catchers Detail -->
+                    <div style="margin-top: 15px; display: flex; gap: 10px;">
+                        <div style="flex: 1; border: 1px solid #ccc; padding: 8px; border-radius: 6px; font-size: 10px;">
+                            <h4 style="margin: 0 0 6px 0; font-size: 11px; font-weight: bold; color: #0d1b2a; border-bottom: 1px solid #eee;">${data.team1Name}</h4>
+                            <p style="font-weight: bold; margin: 4px 0 2px 0;">Lanzadores (Lanzamientos):</p>
+                            ${data.team1Pitchers.map(p => `<div>• ${p.name}: ${p.count} lanz.</div>`).join('') || 'Sin datos'}
+                            <p style="font-weight: bold; margin: 6px 0 2px 0;">Receptores (Outs):</p>
+                            ${data.team1Catchers.map(c => `<div>• ${c.name}: ${c.count} outs</div>`).join('') || 'Sin datos'}
+                        </div>
+
+                        <div style="flex: 1; border: 1px solid #ccc; padding: 8px; border-radius: 6px; font-size: 10px;">
+                            <h4 style="margin: 0 0 6px 0; font-size: 11px; font-weight: bold; color: #0d1b2a; border-bottom: 1px solid #eee;">${data.team2Name}</h4>
+                            <p style="font-weight: bold; margin: 4px 0 2px 0;">Lanzadores (Lanzamientos):</p>
+                            ${data.team2Pitchers.map(p => `<div>• ${p.name}: ${p.count} lanz.</div>`).join('') || 'Sin datos'}
+                            <p style="font-weight: bold; margin: 6px 0 2px 0;">Receptores (Outs):</p>
+                            ${data.team2Catchers.map(c => `<div>• ${c.name}: ${c.count} outs</div>`).join('') || 'Sin datos'}
+                        </div>
+                    </div>
+
+                    <!-- Officiating & Notes -->
+                    <div style="margin-top: 15px; font-size: 10px; display: flex; justify-content: space-between; border-top: 1px solid #ddd; padding-top: 8px;">
+                        <div>
+                            <p style="margin: 2px 0;"><strong>Anotador Oficial:</strong> ${data.scorerName || 'N/A'}</p>
+                            <p style="margin: 2px 0;"><strong>Incidencias:</strong> ${data.eventType}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="margin: 2px 0;"><strong>Pago ${data.team1Name}:</strong> ${data.payTeam1 ? 'Pagado' : 'Pendiente'}</p>
+                            <p style="margin: 2px 0;"><strong>Pago ${data.team2Name}:</strong> ${data.payTeam2 ? 'Pagado' : 'Pendiente'}</p>
+                        </div>
+                    </div>
+
+                    ${data.notes ? `
+                    <div style="margin-top: 8px; font-size: 9px; border: 1px solid #eee; padding: 6px; border-radius: 4px;">
+                        <strong>Observaciones:</strong> ${data.notes}
+                         </div>` : ''}
+                </div>
+            `;
+
+            pdfContainer.classList.remove('hidden');
+
+            const opt = {
+                margin:       [0.3, 0.3, 0.3, 0.3],
+                filename:     `CopaSanAgustin_Juego${data.matchNumber || '0'}_${data.category}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(pdfContainer).save().then(() => {
+                pdfContainer.classList.add('hidden');
+            });
+        }
+    </script>
+</body>
+</html>
