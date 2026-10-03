@@ -233,7 +233,7 @@
                         <!-- Categoría con opciones exactas -->
                         <div>
                             <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Categoría *</label>
-                            <select id="match-category" onchange="updateLiveSummary()" required 
+                            <select id="match-category" onchange="onCategoryChange()" required 
                                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-800 outline-none text-sm font-bold text-navy-900 bg-white transition">
                                 <option value="" disabled selected>-- Seleccione Categoría --</option>
                                 <option value="Semillero">Semillero</option>
@@ -248,19 +248,15 @@
 
                         <div>
                             <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nivel (Opcional)</label>
-                            <select id="match-level" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-800 outline-none text-sm bg-white transition">
-                                <option value="">-- Sin Nivel / Opcional --</option>
-                                <option value="Nivel A">Nivel A</option>
-                                <option value="Nivel B">Nivel B</option>
+                            <select id="match-level" onchange="onLevelChange()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-800 outline-none text-sm bg-white transition">
+                                <option value="">-- Sin Nivel / Todos --</option>
                             </select>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Grupo (Opcional)</label>
-                            <select id="match-group" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-800 outline-none text-sm bg-white transition">
-                                <option value="">-- Sin Grupo / Opcional --</option>
-                                <option value="Grupo A">Grupo A</option>
-                                <option value="Grupo B">Grupo B</option>
+                            <select id="match-group" onchange="onGroupChange()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-navy-800 outline-none text-sm bg-white transition">
+                                <option value="">-- Sin Grupo / Todos --</option>
                             </select>
                         </div>
 
@@ -610,6 +606,192 @@
             });
         }
 
+        // OFICIAL: Listado de Categorías, Niveles, Grupos y Equipos - Copa San Agustín 2026
+        const TOURNAMENT_DATA = {
+            "Semillero": {
+                "Nivel Modificado": {
+                    "General": ["Santa Fe A", "San Luis A", "Las Piedritas A", "Team Jr A", "Cardenales A", "Blue Jays A"]
+                },
+                "Nivel B": {
+                    "General": ["Dodgers B", "Doraya B", "Las Piedritas B", "Team Jr B", "Bravo 16 B", "Atlético B"]
+                }
+            },
+            "Preparatorio": {
+                "Nivel A": {
+                    "Grupo A": ["Atlético A", "San Luis A", "Las Piedritas A", "Team Sucre A", "Team Jr A", "Bravos 16 A vinotinto"],
+                    "Grupo B": ["Caribeans Kids A", "Parque Miranda A", "Lion Kids A", "Bravos de Miranda A", "Las Minas A", "Cardenalitos A"]
+                },
+                "Nivel B": {
+                    "Grupo A": ["Dodgers B", "Cardenalitos B", "Las Piedritas C", "Artilleros B", "Raptors B", "Doraya B"],
+                    "Grupo B": ["Atlético B", "Las Piedritas B", "San Luis B", "Team Sucre B", "The Sea Dog B"],
+                    "Grupo C": ["The Big Hand B", "Cardenales B", "Picapiedras B", "Bravos 16 Gris", "Parque Miranda B"]
+                }
+            },
+            "Preinfantil": {
+                "Nivel A": {
+                    "Grupo A": ["Atlético A", "Bravos 16 Vinotinto", "Team Sucre A", "Huracanes A", "Selección DC preparatorio", "Las Minas A", "Ravelo A"],
+                    "Grupo B": ["Dodgers A", "Parque Miranda A", "Lion Kids A", "Las Piedritas A", "Titanes de Caricuao A", "Selección de Miranda Preparatorio", "Blue Jays A"],
+                    "Grupo C": ["Progreso A", "Las Piedritas B", "Caribeans Kids A", "Team Sucre B", "Bravos de Miranda A", "Santa Fe A", "San Luis A"]
+                },
+                "Nivel B": {
+                    "Grupo A": ["Santa Fe B", "Picapiedras B", "Team Sucre C", "Cardenales B", "Parque Miranda A1", "Incas B"],
+                    "Grupo B": ["Atlético C", "Cachorros de Coche B", "Lion Kids B", "La Urbina B", "Spartans B", "Dmapro B"],
+                    "Grupo C": ["Dodgers B", "Atlético B", "Las Piedritas C", "Picapiedras C", "Caribes Tribu B", "Azulejos del Hatillo B"],
+                    "Grupo D": ["Bravos de Caricuao B", "Doraya B", "Titanes de Catia B", "Bravos 16 Gris", "Cardenalitos B", "Santa Fe A1"]
+                }
+            },
+            "Infantil": {
+                "Nivel A": {
+                    "Grupo A": ["Atlético A", "La Urbina A", "National JC", "Ángeles de Baruta A", "Loyola A", "Cardenalitos A", "Gaudy A"],
+                    "Grupo B": ["Dodgers A", "Team Sucre A", "Lion Kids A", "The Big Hand A", "Cobras A", "Parque Miranda A 1"],
+                    "Grupo C": ["Caribes Tribu A", "Las Piedritas A", "San Francisco LG A", "Santa Fe A", "Parque Miranda A", "Bravos 16 Vinotinto", "KV Vargas A"],
+                    "Grupo D": ["Gigantes A", "Caciques de Sucre A", "Bravos de Caricuao A", "Cachorros de Coche A", "Dmpro A", "Incas A", "KV Vargas A"]
+                },
+                "Nivel B": {
+                    "Grupo A": ["Dodgers B", "Doraya B", "Caciques de Sucre B", "Las Piedritas B", "Azulejos del Hatillo B", "Santa Fe B", "Parque Miranda B1"],
+                    "Grupo B": ["Dodgers C", "Spartans B", "Broncos B", "Picapiedras B", "Atlético B", "La Urbina C", "Lion Kids B"],
+                    "Grupo C": ["Atlético C", "Parque Miranda B", "Black Dog B", "La Urbina B", "Mempet B", "Ravelo B", "Bravos 16 B Gris"],
+                    "Grupo D": ["Progreso B", "Bravos de Miranda B", "Bravos de Caricuao B", "Artilleros B", "Las Piedritas C", "Cardenales B", "Santa Fe B1"]
+                }
+            },
+            "Prejunior": {
+                "Nivel A": {
+                    "Grupo A": ["Atlético A", "Dmpro A", "La Urbina A", "Tigres A", "Las Piedritas A", "Incas A"],
+                    "Grupo B": ["Atta Boys A", "San Luis A", "The Big Hand A", "Lion Kids A", "Santa Fe A", "Team Sucre A"],
+                    "Grupo C": ["On Fire A", "Parque Miranda A", "La Urbina B", "Bravos 16 A vinotinto", "Bravos de Miranda A", "Team Locura A"]
+                },
+                "Nivel B": {
+                    "Grupo A": ["Marlins B", "Team Sucre B", "San Luis B", "Bravos de Caricuao B", "Las Piedritas B", "Parque Miranda B", "Bravos 16 Marron"],
+                    "Grupo B": ["Dodgers B", "Panteras B", "Caribes Tribu B1", "Los Pandas B", "Gigantes B", "Águilas B"],
+                    "Grupo C": ["Artilleros B", "Black Dog B", "Titanes de Catia B", "Bravos de Miranda B", "Cobras B", "Lion Kids B"],
+                    "Grupo D": ["Bravos 16 B Gris", "Parque Miranda A1", "Caribes Tribu B", "Progreso B", "Spartans B", "Doraya B"]
+                }
+            },
+            "Junior": {
+                "Nivel A": {
+                    "General": ["Atlético A", "Dmpro A", "Dodgers A", "Gaudy A", "Atta Boys A"]
+                },
+                "Nivel B": {
+                    "Grupo A": ["Dmpro B", "Team Jr B", "Caribes Tribu B", "Ravelo B", "Bravos de Miranda B"],
+                    "Grupo B": ["Black Dog B", "Broncos B", "Spartans B", "The Big Hand B", "Gran Mariscal B"]
+                }
+            },
+            "Juvenil": {
+                "Único": {
+                    "General": ["Atlético", "The Gots", "Dodgers", "Spartans", "Broncos"]
+                }
+            }
+        };
+
+        function onCategoryChange() {
+            const cat = document.getElementById('match-category').value;
+            const levelSelect = document.getElementById('match-level');
+            const groupSelect = document.getElementById('match-group');
+
+            levelSelect.innerHTML = '<option value="">-- Sin Nivel / Todos --</option>';
+            groupSelect.innerHTML = '<option value="">-- Sin Grupo / Todos --</option>';
+
+            if (cat && TOURNAMENT_DATA[cat]) {
+                const levels = Object.keys(TOURNAMENT_DATA[cat]);
+                levels.forEach(lvl => {
+                    const opt = document.createElement('option');
+                    opt.value = lvl;
+                    opt.innerText = lvl;
+                    levelSelect.appendChild(opt);
+                });
+                if (levels.length === 1 && levels[0] === 'Único') {
+                    levelSelect.value = 'Único';
+                }
+            }
+            onLevelChange();
+            updateLiveSummary();
+        }
+
+        function onLevelChange() {
+            const cat = document.getElementById('match-category').value;
+            const lvl = document.getElementById('match-level').value;
+            const groupSelect = document.getElementById('match-group');
+
+            groupSelect.innerHTML = '<option value="">-- Sin Grupo / Todos --</option>';
+
+            if (cat && TOURNAMENT_DATA[cat]) {
+                let groups = new Set();
+                if (lvl && TOURNAMENT_DATA[cat][lvl]) {
+                    Object.keys(TOURNAMENT_DATA[cat][lvl]).forEach(g => {
+                        if (g !== 'General') groups.add(g);
+                    });
+                } else {
+                    Object.values(TOURNAMENT_DATA[cat]).forEach(lvlObj => {
+                        Object.keys(lvlObj).forEach(g => {
+                            if (g !== 'General') groups.add(g);
+                        });
+                    });
+                }
+                groups.forEach(grp => {
+                    const opt = document.createElement('option');
+                    opt.value = grp;
+                    opt.innerText = grp;
+                    groupSelect.appendChild(opt);
+                });
+            }
+            onGroupChange();
+        }
+
+        function onGroupChange() {
+            populateTeamsDropdown();
+            updateLiveSummary();
+        }
+
+        function populateTeamsDropdown() {
+            const cat = document.getElementById('match-category').value;
+            const lvl = document.getElementById('match-level').value;
+            const grp = document.getElementById('match-group').value;
+
+            let teams = [];
+            if (cat && TOURNAMENT_DATA[cat]) {
+                const catData = TOURNAMENT_DATA[cat];
+                Object.keys(catData).forEach(lKey => {
+                    if (!lvl || lvl === lKey) {
+                        const lvlData = catData[lKey];
+                        Object.keys(lvlData).forEach(gKey => {
+                            if (!grp || grp === gKey || gKey === 'General') {
+                                teams = teams.concat(lvlData[gKey]);
+                            }
+                        });
+                    }
+                });
+            }
+
+            const uniqueTeams = Array.from(new Set(teams)).sort();
+
+            ['team1', 'team2'].forEach(prefix => {
+                const select = document.getElementById(`${prefix}-select`);
+                const currentVal = select.value;
+
+                select.innerHTML = '<option value="">-- Seleccione Equipo --</option>';
+                uniqueTeams.forEach(team => {
+                    const opt = document.createElement('option');
+                    opt.value = team;
+                    opt.innerText = team;
+                    select.appendChild(opt);
+                });
+                const customOpt = document.createElement('option');
+                customOpt.value = 'CUSTOM';
+                customOpt.innerText = '✍️ Escribir otro nombre...';
+                select.appendChild(customOpt);
+
+                if (uniqueTeams.includes(currentVal) || currentVal === 'CUSTOM') {
+                    select.value = currentVal;
+                } else if (currentVal) {
+                    const opt = document.createElement('option');
+                    opt.value = currentVal;
+                    opt.innerText = currentVal;
+                    select.insertBefore(opt, customOpt);
+                    select.value = currentVal;
+                }
+            });
+        }
+
         function initApp() {
             try {
                 const dateInput = document.getElementById('match-date');
@@ -627,6 +809,7 @@
                 if (c1 && c1.children.length === 0) addCatcherRow('team1');
                 if (c2 && c2.children.length === 0) addCatcherRow('team2');
 
+                onCategoryChange();
                 updateLiveSummary();
             } catch(err) {
                 console.error('Error during initApp:', err);
