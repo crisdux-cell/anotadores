@@ -103,11 +103,6 @@
 
             <!-- Header Quick Actions -->
             <div class="flex items-center space-x-2">
-                <button onclick="openHistoryModal()" type="button" class="bg-navy-800 hover:bg-slate-800 border border-gold-500/40 text-gold-400 text-xs px-3.5 py-2 rounded-xl transition flex items-center font-bold shadow-sm">
-                    <i class="fas fa-folder-open mr-1.5 text-sm"></i> 
-                    <span>Historial</span>
-                    <span id="history-badge" class="ml-1.5 bg-gold-500 text-navy-950 px-1.5 py-0.5 rounded-full text-[10px] font-black">0</span>
-                </button>
                 <button onclick="resetForm()" type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-2 rounded-xl transition flex items-center font-medium">
                     <i class="fas fa-rotate-left mr-1.5"></i> <span class="hidden md:inline">Limpiar</span>
                 </button>
@@ -541,29 +536,6 @@
         </main>
     </div>
 
-    <!-- HISTORY MODAL -->
-    <div id="history-modal" class="fixed inset-0 bg-navy-950/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-3">
-        <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-            <div class="bg-navy-900 text-white px-6 py-4 flex items-center justify-between border-b-2 border-gold-500">
-                <h3 class="font-extrabold text-base sm:text-lg flex items-center text-white">
-                    <i class="fas fa-folder-open text-gold-400 mr-2"></i> Historial de Reportes Guardados
-                </h3>
-                <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-white text-xl"><i class="fas fa-times"></i></button>
-            </div>
-
-            <div id="history-list" class="p-4 sm:p-6 overflow-y-auto space-y-3 flex-1">
-                <!-- Loaded dynamically -->
-            </div>
-
-            <div class="bg-slate-100 px-6 py-3 flex justify-between items-center border-t border-slate-200">
-                <button onclick="exportHistoryCSV()" class="text-xs bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3.5 py-2 rounded-xl transition">
-                    <i class="fas fa-file-excel mr-1"></i> Exportar Todo a CSV
-                </button>
-                <button onclick="closeHistoryModal()" class="text-xs bg-slate-700 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-xl">Cerrar</button>
-            </div>
-        </div>
-    </div>
-
     <!-- SUCCESS NOTIFICATION MODAL -->
     <div id="success-modal" class="fixed inset-0 bg-navy-950/75 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 sm:p-8 shadow-2xl text-center space-y-5 border border-slate-200 animate-in fade-in zoom-in duration-200">
@@ -663,7 +635,6 @@
                 if (c2 && c2.children.length === 0) addCatcherRow('team2');
 
                 updateLiveSummary();
-                updateHistoryCountBadge();
             } catch(err) {
                 console.error('Error during initApp:', err);
             }
@@ -935,13 +906,7 @@
 
         let editingGameId = null;
 
-        function updateHistoryCountBadge() {
-            try {
-                const history = JSON.parse(localStorage.getItem('copa_san_agustin_reports') || '[]');
-                const badge = document.getElementById('history-badge');
-                if (badge) badge.innerText = history.length;
-            } catch(e) {}
-        }
+
 
         /* Save Report (Saves locally & synchronizes to Supabase Cloud) */
         async function saveReport() {
@@ -1096,8 +1061,6 @@
             const succMsg = document.getElementById('success-msg');
             if (succMsg) succMsg.innerText = `Juego #${data.matchNumber || ''} (${data.team1Name} vs ${data.team2Name}) guardado exitosamente.`;
             document.getElementById('success-modal').classList.remove('hidden');
-
-            updateHistoryCountBadge();
         }
 
         function closeSuccessModal(reset = false) {
@@ -1294,82 +1257,6 @@
             if (sbBtnText) sbBtnText.innerText = 'Actualizar Cambios';
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function openHistoryModal() {
-            const modal = document.getElementById('history-modal');
-            const list = document.getElementById('history-list');
-            const history = JSON.parse(localStorage.getItem('copa_san_agustin_reports') || '[]');
-
-            updateHistoryCountBadge();
-
-            if (history.length === 0) {
-                list.innerHTML = `
-                    <div class="text-center py-12 text-slate-400">
-                        <i class="fas fa-folder-open text-4xl mb-2 text-slate-300"></i>
-                        <p class="text-sm font-semibold">No se encontraron reportes guardados.</p>
-                        <p class="text-xs text-slate-400 mt-1">Los juegos que guardes aparecerán aquí y podrás editarlos o consultarlos cuando desees.</p>
-                    </div>
-                `;
-            } else {
-                list.innerHTML = history.map((item, idx) => `
-                    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:border-gold-500 transition">
-                        <div>
-                            <div class="flex items-center space-x-2 flex-wrap gap-y-1">
-                                <span class="bg-navy-900 text-gold-400 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase">${item.category}</span>
-                                <span class="text-xs font-bold text-slate-500">Juego #${item.matchNumber} | 📅 ${item.date}</span>
-                                <span class="text-xs text-slate-400 font-medium">Campo: ${item.field}</span>
-                            </div>
-                            <h4 class="font-black text-navy-900 text-base sm:text-lg mt-1">
-                                ${item.team1Name} <span class="text-emerald-700">(${item.team1Runs})</span> vs ${item.team2Name} <span class="text-slate-700">(${item.team2Runs})</span>
-                            </h4>
-                            <p class="text-xs text-slate-500 mt-0.5">
-                                Anotador: <b class="text-slate-700">${item.scorerName || 'Oficial'}</b>
-                                ${item.mvpName ? ' • ⭐ MVP: <b class="text-amber-700">' + item.mvpName + '</b>' : ''}
-                            </p>
-                        </div>
-                        <div class="flex items-center space-x-2 self-end sm:self-center">
-                            <button onclick="editHistoryItem(${idx})" class="gold-gradient text-navy-950 hover:brightness-105 px-3.5 py-2 rounded-xl text-xs font-black transition flex items-center shadow-md">
-                                <i class="fas fa-edit mr-1.5"></i> Cargar y Editar
-                            </button>
-                            <button onclick="deleteHistoryItem(${idx})" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-xl text-xs font-bold transition" title="Eliminar registro">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-            modal.classList.remove('hidden');
-        }
-
-        function closeHistoryModal() {
-            document.getElementById('history-modal').classList.add('hidden');
-        }
-
-        function deleteHistoryItem(idx) {
-            if (confirm('¿Desea eliminar esta anotación del historial?')) {
-                let history = JSON.parse(localStorage.getItem('copa_san_agustin_reports') || '[]');
-                history.splice(idx, 1);
-                localStorage.setItem('copa_san_agustin_reports', JSON.stringify(history));
-                openHistoryModal();
-            }
-        }
-
-        function exportHistoryCSV() {
-            const history = JSON.parse(localStorage.getItem('copa_san_agustin_reports') || '[]');
-            if (history.length === 0) return alert('No hay reportes para exportar');
-
-            let csv = 'Juego,Fecha,Categoria,Campo,Equipo1,Carreras1,Equipo2,Carreras2,MVP,Anotador\n';
-            history.forEach(r => {
-                csv += `"${r.matchNumber}","${r.date}","${r.category}","${r.field}","${r.team1Name}",${r.team1Runs},"${r.team2Name}",${r.team2Runs},"${r.mvpName}","${r.scorerName}"\n`;
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Reportes_CopaSanAgustin_2026.csv`;
-            a.click();
         }
 
         function exportToPDF() {
