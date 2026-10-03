@@ -89,16 +89,10 @@
 
             <!-- Quick Navigation & Live Sync Status -->
             <div class="flex items-center space-x-2 sm:space-x-3">
-                <!-- Live Sync Indicator -->
-                <div id="sync-badge" class="hidden sm:flex items-center space-x-1.5 bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 text-xs px-3 py-1.5 rounded-xl font-semibold">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span>Recepción en vivo</span>
-                </div>
-
                 <!-- Link to Scorer Index -->
                 <a href="index.html" class="gold-gradient text-navy-950 font-black text-xs px-3.5 py-2 rounded-xl shadow-md hover:brightness-105 transition flex items-center space-x-1.5">
                     <i class="fas fa-edit"></i>
-                    <span>Ir al Anotador</span>
+                    <span>Panel de Anotador</span>
                 </a>
 
                 <!-- Lock / Logout Admin Button -->
@@ -215,11 +209,6 @@
                     <i class="fas fa-file-csv mr-1.5 text-emerald-600 text-sm"></i> CSV
                 </button>
 
-                <!-- Demo Data Button -->
-                <button onclick="loadDemoData()" title="Cargar juegos de ejemplo" class="bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center">
-                    <i class="fas fa-magic mr-1.5 text-amber-500"></i> Ejemplos
-                </button>
-
                 <!-- New game shortcut -->
                 <a href="index.html" class="bg-navy-900 hover:bg-navy-800 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow transition flex items-center">
                     <i class="fas fa-plus mr-1.5 text-gold-400"></i> Nuevo Juego
@@ -251,12 +240,9 @@
                 Los resultados que los anotadores guarden en el <b>index</b> aparecerán automáticamente aquí en tiempo real.
             </p>
             <div class="mt-4 flex items-center justify-center gap-3">
-                <a href="index.html" class="gold-gradient text-navy-950 text-xs font-black px-4 py-2 rounded-xl shadow">
-                    <i class="fas fa-plus mr-1"></i> Ir al Anotador (index)
+                <a href="index.html" class="gold-gradient text-navy-950 text-xs font-black px-4 py-2 rounded-xl shadow hover:brightness-105 transition">
+                    <i class="fas fa-edit mr-1.5"></i> Panel de Anotador
                 </a>
-                <button onclick="loadDemoData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-4 py-2 rounded-xl">
-                    <i class="fas fa-magic mr-1"></i> Cargar Juegos de Demostración
-                </button>
             </div>
         </div>
 
