@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es" class="h-full">
 <head>
     <meta charset="UTF-8">
@@ -8,8 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- html2pdf.js for PDF export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- Supabase JS Client for Cloud PostgreSQL -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Google Fonts: Inter -->
@@ -269,11 +267,7 @@
                 <!-- Dynamically populated to match Photo 2 -->
             </div>
 
-            <div class="bg-white px-6 py-4 flex justify-between items-center border-t border-slate-200">
-                <button id="modal-pdf-btn" class="text-xs bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2.5 rounded-xl transition flex items-center space-x-2 shadow-sm">
-                    <i class="fas fa-file-pdf text-red-500 text-sm"></i>
-                    <span>Descargar Acta PDF</span>
-                </button>
+            <div class="bg-white px-6 py-4 flex justify-end items-center border-t border-slate-200">
                 <div class="flex items-center space-x-2">
                     <button onclick="deleteGameFromModal()" class="text-xs text-red-500 hover:text-red-700 font-bold px-3 py-2 rounded-xl transition hover:bg-red-50" title="Eliminar registro">
                         <i class="fas fa-trash-alt mr-1"></i> Eliminar
@@ -285,9 +279,6 @@
             </div>
         </div>
     </div>
-
-    <!-- INVISIBLE PDF GENERATOR CONTAINER -->
-    <div id="pdf-export-container" class="hidden"></div>
 
     <!-- TOAST NOTIFICATION CONTAINER -->
     <div id="toast" class="fixed bottom-5 right-5 bg-navy-900 text-white border-2 border-gold-500 px-4 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 transition-all duration-300 transform translate-y-24 opacity-0 z-50">
@@ -862,7 +853,6 @@
                 </div>
             `;
 
-            document.getElementById('modal-pdf-btn').onclick = () => downloadPDF(game.id);
             document.getElementById('details-modal').classList.remove('hidden');
         }
 
@@ -933,109 +923,7 @@
             showToast('Actualizado', 'Se actualizaron las carreras del juego.');
         }
 
-        // PDF Generation
-        function downloadPDF(gameId) {
-            const games = getGames();
-            const data = games.find(g => g.id === gameId);
-            if (!data) return;
-
-            const container = document.getElementById('pdf-export-container');
-            container.innerHTML = `
-                <div style="font-family: Arial, sans-serif; color: #0d1b2a; padding: 25px; border: 3px solid #d4af37; max-width: 800px; margin: auto; background: #fff;">
-                    
-                    <!-- Header -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0d1b2a; padding-bottom: 12px; margin-bottom: 15px;">
-                        <div>
-                            <span style="background: #d4af37; color: #0d1b2a; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 4px;">SEXTA EDICIÓN</span>
-                            <h1 style="font-size: 22px; font-weight: 900; color: #0d1b2a; margin: 4px 0 0 0;">COPA SAN AGUSTÍN 2026</h1>
-                            <p style="font-size: 11px; color: #666; margin: 0;">Acta y Reporte Oficial del Administrador</p>
-                        </div>
-                        <div style="text-align: right; font-size: 11px; line-height: 1.4;">
-                            <p style="margin: 0;"><strong>Juego N°:</strong> ${data.matchNumber || 'N/A'}</p>
-                            <p style="margin: 0;"><strong>Categoría:</strong> ${data.category || 'N/A'}</p>
-                            <p style="margin: 0;"><strong>Fecha:</strong> ${data.date}</p>
-                            <p style="margin: 0;"><strong>Campo:</strong> ${data.field || 'N/A'}</p>
-                        </div>
-                    </div>
-
-                    <!-- Scoreboard -->
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; text-align: center;">
-                        <thead>
-                            <tr style="background: #0d1b2a; color: #d4af37;">
-                                <th style="padding: 10px; text-align: left;">Equipo</th>
-                                <th style="padding: 10px;">Condición</th>
-                                <th style="padding: 10px;">Carreras</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="border-bottom: 1px solid #ddd; background: #fafafa;">
-                                <td style="padding: 10px; text-align: left; font-weight: bold;">${data.team1Name}</td>
-                                <td style="padding: 10px;">${data.resultMode === 'tie' ? 'Empate' : (parseInt(data.team1Runs) > parseInt(data.team2Runs) ? 'Ganador' : 'Perdedor')}</td>
-                                <td style="padding: 10px; font-weight: 900; font-size: 16px;">${data.team1Runs}</td>
-                            </tr>
-                            <tr style="background: #fafafa;">
-                                <td style="padding: 10px; text-align: left; font-weight: bold;">${data.team2Name}</td>
-                                <td style="padding: 10px;">${data.resultMode === 'tie' ? 'Empate' : (parseInt(data.team2Runs) > parseInt(data.team1Runs) ? 'Ganador' : 'Perdedor')}</td>
-                                <td style="padding: 10px; font-weight: 900; font-size: 16px;">${data.team2Runs}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <!-- MVP -->
-                    <div style="margin-top: 15px; border: 1px solid #d4af37; background: #fffdf5; padding: 12px; border-radius: 8px;">
-                        <h3 style="font-size: 12px; font-weight: bold; color: #836202; margin: 0 0 4px 0;">🏆 JUGADOR MÁS VALIOSO (MVP)</h3>
-                        <p style="font-size: 12px; margin: 2px 0;"><strong>Jugador:</strong> ${data.mvpName || 'Sin MVP registrado'}</p>
-                        <p style="font-size: 11px; margin: 2px 0; color: #555;"><strong>Actuación:</strong> ${data.mvpStats || 'Sin observaciones'}</p>
-                    </div>
-
-                    <!-- Pitchers & Catchers -->
-                    <div style="margin-top: 15px; display: flex; gap: 15px;">
-                        <div style="flex: 1; border: 1px solid #ddd; padding: 10px; border-radius: 8px; font-size: 11px;">
-                            <h4 style="margin: 0 0 6px 0; font-size: 12px; font-weight: bold; color: #0d1b2a; border-bottom: 1px solid #eee; padding-bottom: 4px;">${data.team1Name}</h4>
-                            <p style="font-weight: bold; margin: 4px 0 2px 0;">Lanzadores (Lanzamientos):</p>
-                            ${(data.team1Pitchers && data.team1Pitchers.length) ? data.team1Pitchers.map(p => `<div>• ${p.name}: ${p.count} lanz.</div>`).join('') : '<div style="color: #888;">Sin datos</div>'}
-                            <p style="font-weight: bold; margin: 6px 0 2px 0;">Receptores (Outs):</p>
-                            ${(data.team1Catchers && data.team1Catchers.length) ? data.team1Catchers.map(c => `<div>• ${c.name}: ${c.count} outs</div>`).join('') : '<div style="color: #888;">Sin datos</div>'}
-                        </div>
-
-                        <div style="flex: 1; border: 1px solid #ddd; padding: 10px; border-radius: 8px; font-size: 11px;">
-                            <h4 style="margin: 0 0 6px 0; font-size: 12px; font-weight: bold; color: #0d1b2a; border-bottom: 1px solid #eee; padding-bottom: 4px;">${data.team2Name}</h4>
-                            <p style="font-weight: bold; margin: 4px 0 2px 0;">Lanzadores (Lanzamientos):</p>
-                            ${(data.team2Pitchers && data.team2Pitchers.length) ? data.team2Pitchers.map(p => `<div>• ${p.name}: ${p.count} lanz.</div>`).join('') : '<div style="color: #888;">Sin datos</div>'}
-                            <p style="font-weight: bold; margin: 6px 0 2px 0;">Receptores (Outs):</p>
-                            ${(data.team2Catchers && data.team2Catchers.length) ? data.team2Catchers.map(c => `<div>• ${c.name}: ${c.count} outs</div>`).join('') : '<div style="color: #888;">Sin datos</div>'}
-                        </div>
-                    </div>
-
-                    <!-- Footer & Status -->
-                    <div style="margin-top: 15px; font-size: 11px; display: flex; justify-content: space-between; border-top: 1px solid #ddd; padding-top: 10px;">
-                        <div>
-                            <p style="margin: 2px 0;"><strong>Anotador Oficial:</strong> ${data.scorerName || 'N/A'}</p>
-                            <p style="margin: 2px 0;"><strong>Incidencias:</strong> ${data.eventType || 'Ninguna'}</p>
-                        </div>
-                        <div style="text-align: right;">
-                            <p style="margin: 2px 0;"><strong>Arbitraje ${data.team1Name}:</strong> ${data.payTeam1 ? 'Pagado' : 'Pendiente'}</p>
-                            <p style="margin: 2px 0;"><strong>Arbitraje ${data.team2Name}:</strong> ${data.payTeam2 ? 'Pagado' : 'Pendiente'}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            container.classList.remove('hidden');
-
-            const opt = {
-                margin:       [0.3, 0.3, 0.3, 0.3],
-                filename:     `Acta_Juego_${data.matchNumber || '0'}_CopaSanAgustin.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(container).save().then(() => {
-                container.classList.add('hidden');
-                showToast('Acta Generada', 'El archivo PDF ha sido descargado correctamente.');
-            });
-        }
+        
 
         // Export all to CSV
         function exportCSV() {
