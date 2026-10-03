@@ -160,7 +160,7 @@
                     <label class="text-xs font-bold text-slate-500 uppercase flex items-center">
                         <i class="fas fa-sort-amount-down text-navy-800 mr-1.5"></i> Ordenar:
                     </label>
-                    <select id="sort-order" onchange="renderGames()" class="bg-slate-50 border border-slate-300 text-xs font-bold text-slate-800 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-gold-500 cursor-pointer">
+                    <select id="sort-order" onchange="resetPageAndRender()" class="bg-slate-50 border border-slate-300 text-xs font-bold text-slate-800 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-gold-500 cursor-pointer">
                         <option value="date-desc">📅 Fecha (Más reciente primero)</option>
                         <option value="date-asc">📅 Fecha (Más antigua primero)</option>
                         <option value="match-asc">🔢 N° de Juego (Ascendente)</option>
@@ -173,7 +173,7 @@
                 <!-- Category filter -->
                 <div class="flex items-center space-x-2">
                     <label class="text-xs font-bold text-slate-500 uppercase">Categoría:</label>
-                    <select id="filter-category" onchange="renderGames()" class="bg-slate-50 border border-slate-300 text-xs font-bold text-slate-800 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-gold-500 cursor-pointer">
+                    <select id="filter-category" onchange="resetPageAndRender()" class="bg-slate-50 border border-slate-300 text-xs font-bold text-slate-800 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-gold-500 cursor-pointer">
                         <option value="ALL">Todas las Categorías</option>
                         <option value="Semillero">Semillero</option>
                         <option value="Preparatorio">Preparatorio</option>
@@ -187,7 +187,7 @@
 
                 <!-- Status filter -->
                 <div class="flex items-center space-x-2">
-                    <select id="filter-status" onchange="renderGames()" class="bg-slate-50 border border-slate-300 text-xs font-bold text-slate-800 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-gold-500 cursor-pointer">
+                    <select id="filter-status" onchange="resetPageAndRender()" class="bg-slate-50 border border-slate-300 text-xs font-bold text-slate-800 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-gold-500 cursor-pointer">
                         <option value="ALL">Todos los Estados</option>
                         <option value="PAID">Arbitraje Pagado</option>
                         <option value="PENDING_PAY">Arbitraje Pendiente</option>
@@ -201,7 +201,7 @@
                 <!-- Search box -->
                 <div class="relative flex-1 sm:w-60">
                     <i class="fas fa-search absolute left-3 top-3 text-slate-400 text-xs"></i>
-                    <input type="text" id="search-input" oninput="renderGames()" placeholder="Buscar equipo, anotador, campo..."
+                    <input type="text" id="search-input" oninput="resetPageAndRender()" placeholder="Buscar equipo, anotador, campo..."
                            class="w-full bg-slate-50 pl-8 pr-3 py-2 rounded-xl border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-gold-500 outline-none">
                 </div>
 
@@ -343,6 +343,8 @@
         const ADMIN_PIN = 'admin2026'; // Clave por defecto para el administrador
         let currentModalGame = null;
         let targetModuleGameId = null;
+        let memoryGames = [];
+        let displayLimit = 30;
 
         // Configuración oficial de Supabase Cloud PostgreSQL
         const SUPABASE_URL = 'https://evcoahljwsdwtphvypqh.supabase.co';
@@ -410,7 +412,25 @@
                         };
                     });
 
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(mapped));
+                    // Almacenar todos los juegos completos en memoria RAM (soporta 1000+ juegos con fotos sin límites)
+                    memoryGames = mapped;
+
+                    // Para el respaldo offline en localStorage, guardar de forma ligera para no desbordar los 5MB del navegador
+                    try {
+                        const lightweight = mapped.map((g, idx) => {
+                            if (idx >= 6) {
+                                return { ...g, mvpPhoto: '', receiptTeam1: '', receiptTeam2: '' };
+                            }
+                            return g;
+                        });
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(lightweight));
+                    } catch(quotaErr) {
+                        try {
+                            const textOnly = mapped.map(g => ({ ...g, mvpPhoto: '', receiptTeam1: '', receiptTeam2: '' }));
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(textOnly));
+                        } catch(e) {}
+                    }
+
                     renderGames();
                 }
             } catch(e) {
@@ -486,8 +506,26 @@
             }
         });
 
-        // Retrieve games from local storage
+        function resetPageAndRender() {
+            displayLimit = 30;
+            renderGames();
+        }
+
+        function loadMoreGames(step = 30) {
+            displayLimit += step;
+            renderGames();
+        }
+
+        function loadAllGames() {
+            displayLimit = 999999;
+            renderGames();
+        }
+
+        // Retrieve games from RAM memory or local storage
         function getGames() {
+            if (memoryGames && memoryGames.length > 0) {
+                return memoryGames;
+            }
             try {
                 return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
             } catch (e) {
@@ -497,7 +535,16 @@
         }
 
         function saveGames(games) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+            memoryGames = games;
+            try {
+                const lightweight = games.map((g, idx) => {
+                    if (idx >= 6) {
+                        return { ...g, mvpPhoto: '', receiptTeam1: '', receiptTeam2: '' };
+                    }
+                    return g;
+                });
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(lightweight));
+            } catch(e) {}
             channel.postMessage({ type: 'GAMES_UPDATED' });
             renderGames();
         }
@@ -506,7 +553,7 @@
         function renderGames() {
             let games = getGames();
 
-            // Update stats counter
+            // Update stats counter with all matches
             updateStats(games);
 
             // Filter by category
@@ -559,9 +606,10 @@
             const emptyState = document.getElementById('empty-state');
             const badgeCount = document.getElementById('badge-count');
 
-            badgeCount.innerText = games.length;
+            const totalMatches = games.length;
+            badgeCount.innerText = totalMatches;
 
-            if (games.length === 0) {
+            if (totalMatches === 0) {
                 grid.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 return;
@@ -569,8 +617,10 @@
 
             emptyState.classList.add('hidden');
 
-            // Generate clean HTML for cards as requested (without bell, action buttons row, or modules)
-            grid.innerHTML = games.map((game, index) => {
+            const visibleGames = games.slice(0, displayLimit);
+
+            // Generate clean HTML for cards as requested
+            let cardsHtml = visibleGames.map((game, index) => {
                 // Format dates
                 const createdDate = game.timestamp ? new Date(game.timestamp).toLocaleDateString('es-ES') : (game.date || '01/10/2026');
                 const gameDate = game.date ? formatDateString(game.date) : 'Pendiente';
@@ -636,6 +686,33 @@
                 </div>
                 `;
             }).join('');
+
+            if (totalMatches > displayLimit) {
+                cardsHtml += `
+                    <div class="col-span-full bg-white rounded-2xl p-6 border-2 border-dashed border-slate-200 text-center flex flex-col items-center justify-center space-y-3 mt-2 card-shadow">
+                        <div class="w-10 h-10 rounded-full bg-navy-900 text-gold-400 flex items-center justify-center text-sm font-black">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-700">
+                                Mostrando <span class="text-navy-900 font-black">${visibleGames.length}</span> de <span class="text-navy-900 font-black">${totalMatches}</span> juegos registrados
+                            </p>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Rendimiento optimizado para alta capacidad de juegos y fotos.</p>
+                        </div>
+                        <div class="flex items-center space-x-2 pt-1">
+                            <button type="button" onclick="loadMoreGames(30)" class="gold-gradient text-navy-950 font-black text-xs px-5 py-2.5 rounded-xl shadow hover:brightness-105 transition flex items-center space-x-1.5 active:scale-95">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Cargar 30 más</span>
+                            </button>
+                            <button type="button" onclick="loadAllGames()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-xl transition flex items-center space-x-1">
+                                <span>Ver todos (${totalMatches})</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            grid.innerHTML = cardsHtml;
         }
 
         // Stats updates

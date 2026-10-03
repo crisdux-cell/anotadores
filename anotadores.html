@@ -600,8 +600,8 @@
         let receiptTeam1Base64 = '';
         let receiptTeam2Base64 = '';
 
-        // Helper para comprimir fotos antes de guardar/enviar a Supabase (optimiza a ~60KB)
-        function compressImage(file, maxWidth = 800, maxHeight = 800, quality = 0.75) {
+        // Helper para comprimir fotos antes de guardar/enviar a Supabase (optimiza a ~35KB ultra ligero y nítido)
+        function compressImage(file, maxWidth = 720, maxHeight = 720, quality = 0.68) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -1128,7 +1128,7 @@
             if (!file) return;
 
             try {
-                const compressed = await compressImage(file, 900, 900, 0.75);
+                const compressed = await compressImage(file, 720, 720, 0.68);
                 if (teamPrefix === 'team1') {
                     receiptTeam1Base64 = compressed;
                     const img = document.getElementById('team1-receipt-img');
@@ -1225,6 +1225,39 @@
 
 
 
+        // Guarda en localStorage evitando el error QuotaExceededError (5MB de límite del navegador)
+        function saveToLocalStorageSafe(history) {
+            try {
+                // Conserva fotos completas para los últimos 8 juegos y libera las de los juegos anteriores
+                const optimized = history.map((item, idx) => {
+                    if (idx >= 8) {
+                        return {
+                            ...item,
+                            mvpPhoto: '',
+                            receiptTeam1: '',
+                            receiptTeam2: ''
+                        };
+                    }
+                    return item;
+                });
+                localStorage.setItem('copa_san_agustin_reports', JSON.stringify(optimized));
+            } catch(e) {
+                try {
+                    // Si el dispositivo móvil tiene cuota muy reducida, guarda todos los registros sin fotos
+                    // (las fotos quedan 100% seguras en la nube de Supabase)
+                    const textOnly = history.map(item => ({
+                        ...item,
+                        mvpPhoto: '',
+                        receiptTeam1: '',
+                        receiptTeam2: ''
+                    }));
+                    localStorage.setItem('copa_san_agustin_reports', JSON.stringify(textOnly));
+                } catch(err2) {
+                    console.warn('Memoria local llena. Los datos se respaldan en Supabase:', err2);
+                }
+            }
+        }
+
         /* Save Report (Saves locally & synchronizes to Supabase Cloud) */
         async function saveReport() {
             const data = collectData();
@@ -1251,7 +1284,7 @@
                 history.unshift(data);
             }
 
-            localStorage.setItem('copa_san_agustin_reports', JSON.stringify(history));
+            saveToLocalStorageSafe(history);
 
             // Sincronizar en la Nube con Supabase (PostgreSQL)
             if (supabaseClient) {
